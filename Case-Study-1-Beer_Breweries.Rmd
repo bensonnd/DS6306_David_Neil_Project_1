@@ -2,23 +2,21 @@
 title: "Case-Study-1-Beer_Breweries"
 author: "David Wei, Neil Benson"
 date: "6/15/2020"
-
 output: html_document
-
 ---
 
+## Adding In Files
 _Import File & General Libraries_
 ## this 
 ```{r}
 library(ggplot2) 
-
 library(ggthemes)
 library(dplyr) 
 library(tidyverse)
 library(forcats)
 
-#beer <- read.csv("C:/Users/David/Google Drive/Masters/Data Files/Beers.csv")
-#brew <- read.csv("C:/Users/David/Google Drive/Masters/Data Files/Breweries.csv")
+beer <- read.csv("C:/Users/David/Google Drive/Masters/Data Files/Beers.csv")
+brew <- read.csv("C:/Users/David/Google Drive/Masters/Data Files/Breweries.csv")
 #beer <- read.csv("C:/Git/MSDS_6306_Doing-Data-Science/Unit 8 and 9 Case Study 1/Beers.csv")
 #brew <- read.csv("C:/Git/MSDS_6306_Doing-Data-Science/Unit 8 and 9 Case Study 1/Breweries.csv")
 
@@ -26,6 +24,7 @@ head(beer,5)
 head(brew, 5)
 ```
 
+## Once the files are merged in, 
 _Data Tidying_
 ```{r}
 # left join brew into beer based on brew_id, then renaming and sorting columns
@@ -50,12 +49,10 @@ head(beer_df_cleaned, 5)
 
 _Analysis #1: How many breweries are present in each state?_
 ```{r}
-
 # beer_df_cleaned %>% group_by(State, Brewery_ID) %>% tally summarise(brew_count_per_state = count())
 # beer_df_cleaned %>% arrange(desc(Max_IBU)) %>% ggplot(aes(x = State,fill=State)) + geom_histogram(stat="count") + theme(legend.position = "none") + ggtitle("# of Breweries per State")
 
 #beer_df_cleaned %>% group_by(State,Brewery_ID) %>% ggplot(aes(x = State,fill=State)) + geom_bar(stat="count") + theme(legend.position = "none") + ggtitle("# of Breweries per State")
-
 beer_df_cleaned %>%
   group_by(State) %>%
   summarise(distinct_breweries = n_distinct(Brewery_ID)) %>% 
@@ -64,7 +61,6 @@ beer_df_cleaned %>%
   geom_bar(stat="identity") + 
   theme(legend.position = "none", axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 8)) + 
   ggtitle("# of Breweries per State")
-
 
 ```
 _Analysis #2: Merge Beer and Breweries, print first and last 6 obs_
@@ -136,7 +132,6 @@ summary_df %>% filter(State=="OR")
 _Analysis #6: Commenting on summary stats and distributino of ABV variable._
 ```{r}
 # refer to Analysis #5 outputs
-
 summary(beer_df_cleaned$ABV)
 hist(beer_df_cleaned$ABV, breaks=10, border="black", col="#7CAE00", xlab="ABV (%)", main="Beer ABV Distribution")
 summary_ABV <- summary_table(beer_df_cleaned, )
