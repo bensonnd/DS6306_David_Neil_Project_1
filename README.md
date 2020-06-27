@@ -2,6 +2,8 @@
  
 ## Data Sources  
 ### Beers.csv:  
+#### &nbsp;&nbsp;&nbsp;&nbsp;2,410 unique beers from 558 breweries  
+  
 &nbsp;&nbsp;&nbsp;&nbsp;Name: Name of the beer.  
 &nbsp;&nbsp;&nbsp;&nbsp;Beer_ID: Unique identifier of the beer.  
 &nbsp;&nbsp;&nbsp;&nbsp;ABV: Alcohol by volume of the beer.  
@@ -11,6 +13,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;Ounces: Ounces of beer.  
 
 ### Breweries.csv:  
+#### &nbsp;&nbsp;&nbsp;&nbsp;558 unique breweries in all 50 states + DC  
+  
 &nbsp;&nbsp;&nbsp;&nbsp;Brew_ID: Unique identifier of the brewery.  
 &nbsp;&nbsp;&nbsp;&nbsp;Name: Name of the brewery.  
 &nbsp;&nbsp;&nbsp;&nbsp;City: City where the brewery is located.  
