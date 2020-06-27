@@ -2,20 +2,26 @@
 title: "Case-Study-1-Beer_Breweries"
 author: "David Wei, Neil Benson"
 date: "6/15/2020"
+
 output: html_document
+
 ---
 
 _Import File & General Libraries_
 ## this 
 ```{r}
 library(ggplot2) 
+
 library(ggthemes)
 library(dplyr) 
 library(tidyverse)
 library(forcats)
 
-beer <- read.csv("C:/Users/David/Google Drive/Masters/Data Files/Beers.csv")
-brew <- read.csv("C:/Users/David/Google Drive/Masters/Data Files/Breweries.csv")
+#beer <- read.csv("C:/Users/David/Google Drive/Masters/Data Files/Beers.csv")
+#brew <- read.csv("C:/Users/David/Google Drive/Masters/Data Files/Breweries.csv")
+#beer <- read.csv("C:/Git/MSDS_6306_Doing-Data-Science/Unit 8 and 9 Case Study 1/Beers.csv")
+#brew <- read.csv("C:/Git/MSDS_6306_Doing-Data-Science/Unit 8 and 9 Case Study 1/Breweries.csv")
+
 head(beer,5)
 head(brew, 5)
 ```
@@ -44,11 +50,21 @@ head(beer_df_cleaned, 5)
 
 _Analysis #1: How many breweries are present in each state?_
 ```{r}
-# beer_df_cleaned %>% ggplot(aes(x = State,fill=State)) + geom_histogram(stat="count") + scale_y_continuous() +  theme(legend.position = "none") + ggtitle("# of Breweries per State")
 
-brewery_count <- beer_df_cleaned %>% group_by(State) %>% summarise(Count=n())
-brewery_count %>% ggplot(aes(x=reorder(State, -Count), y=Count, fill=State)) + geom_bar(stat='identity') +
-  theme(legend.position = "none") + xlab("State") + ggtitle("Descending # of Breweries per State") 
+# beer_df_cleaned %>% group_by(State, Brewery_ID) %>% tally summarise(brew_count_per_state = count())
+# beer_df_cleaned %>% arrange(desc(Max_IBU)) %>% ggplot(aes(x = State,fill=State)) + geom_histogram(stat="count") + theme(legend.position = "none") + ggtitle("# of Breweries per State")
+
+#beer_df_cleaned %>% group_by(State,Brewery_ID) %>% ggplot(aes(x = State,fill=State)) + geom_bar(stat="count") + theme(legend.position = "none") + ggtitle("# of Breweries per State")
+
+beer_df_cleaned %>%
+  group_by(State) %>%
+  summarise(distinct_breweries = n_distinct(Brewery_ID)) %>% 
+  mutate(State = fct_reorder(State, desc(distinct_breweries))) %>%
+  ggplot(aes(x = State, y = distinct_breweries, fill=State)) + 
+  geom_bar(stat="identity") + 
+  theme(legend.position = "none", axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 8)) + 
+  ggtitle("# of Breweries per State")
+
 
 ```
 _Analysis #2: Merge Beer and Breweries, print first and last 6 obs_
@@ -68,6 +84,7 @@ IBU_summary <- beer_df_cleaned %>% group_by(State) %>% summarise(Median_IBU=medi
 # joining the 2 dfs
 summary_df <- merge(x=ABV_summary, y=IBU_summary, by="State", all=TRUE)
 # scaling ABV and IBU for easier comparison
+
 summary_df$median_ABV.scaled = scale(summary_df$Median_ABV)
 summary_df$median_IBU.scaled = scale(summary_df$Median_IBU)
 summary_df$max_ABV.scaled= scale(summary_df$Max_ABV)
@@ -90,11 +107,11 @@ summary_df %>% arrange(desc(Median_ABV)) %>% mutate(State=fct_reorder(State, Med
 summary_df %>% arrange(desc(Median_IBU)) %>% mutate(State=fct_reorder(State, Median_IBU)) %>%
   ggplot(aes(State, Median_IBU,fill=State)) + geom_bar(stat="identity", position="dodge",fill="#00BFC4") + theme(legend.position = "none", axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 8))+ labs(title="Median IBU per State")
 
-
 ```
 _Analysis #5: Which state has maximum ABV beer? Which state has most bitter(max IBU) beer?_
 ```{r}
 # comparing ABV vs IBU max
+
 # myColors <- c("#7CAE00", "#C77CFF")
 myColors <- c("#56ddc5", "#4699dd")
 summary_df_pivot %>% filter(variable=="max_ABV.scaled" | variable=="max_IBU.scaled") %>% ggplot(aes(State,value,fill=variable)) + theme(legend.position = "none", axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 8)) + 
@@ -110,6 +127,7 @@ summary_df %>% arrange(desc(Max_IBU)) %>% mutate(State=fct_reorder(State, Max_IB
   ggplot(aes(State, Max_IBU,fill=State)) + geom_bar(stat="identity", position="dodge",fill="#4699dd") + 
   ylab("Max IBU") + theme(legend.position="none") + labs(title="Top 10 States with Most Bitter Beers")
 
+
 # validating accuracy of data
 summary_df %>% filter(State=="CO")
 summary_df %>% filter(State=="OR")
@@ -118,6 +136,7 @@ summary_df %>% filter(State=="OR")
 _Analysis #6: Commenting on summary stats and distributino of ABV variable._
 ```{r}
 # refer to Analysis #5 outputs
+
 summary(beer_df_cleaned$ABV)
 hist(beer_df_cleaned$ABV, breaks=10, border="black", col="#7CAE00", xlab="ABV (%)", main="Beer ABV Distribution")
 summary_ABV <- summary_table(beer_df_cleaned, )
@@ -137,7 +156,8 @@ beer_df_cleaned$IBU.log <- log(beer_df_cleaned$IBU)
 
 # install.packages("ggExtra")
 library(ggExtra)
-ABV_IBU_rel <- beer_df_cleaned %>% group_by(State) %>% ggplot(aes(x=ABV, y=IBU, fill=)) + geom_point() + geom_smooth(method="lm") +
+
+ABV_IBU_rel <- beer_df_cleaned %>% group_by(State) %>% ggplot(aes(x=ABV, y=IBU)) + geom_point() + geom_smooth(method="lm") +
   scale_x_continuous("Max ABV (%)",label=scales::percent) + 
   labs(title="Relationship between ABV and IBU",
        caption="Source: beer, brewery data")
@@ -165,14 +185,13 @@ beer_df_cleaned$Beer_Category <- ifelse(grepl("Ale", beer_df_cleaned$Style), "Al
                                         ifelse(grepl("IPA", beer_df_cleaned$Style) | grepl("India Pale Ales", beer_df_cleaned$Style), "IPA", "Other"))
 head(beer_df_cleaned, 50)
 
-# install.packages("ggExtra")
-
 # kNN
 library(class) # for knn
 library(caret) # for confusionMatrix
 match("ABV", names(beer_df_cleaned)) # column 7
 match("IBU", names(beer_df_cleaned)) # column 8
 # running kNN k=5
+
 knn.cv(beer_df_cleaned[,c(7,8)],beer_df_cleaned$Beer_Category,prob = TRUE, k = 5)
 beer_df_cleaned$pred_beer_cat <- knn.cv(beer_df_cleaned[,c(7,8)],beer_df_cleaned$Beer_Category,prob = TRUE, k = 5)
 confusionMatrix(table(beer_df_cleaned$pred_beer_cat,beer_df_cleaned$Beer_Category))
