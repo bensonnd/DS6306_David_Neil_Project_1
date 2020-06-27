@@ -1,0 +1,172 @@
+---
+title: "Case-Study-1-Beer_Breweries"
+author: "David Wei, Neil Benson"
+date: "6/15/2020"
+output: word_document
+---
+
+_Import File & General Libraries_
+## this 
+```{r}
+library(ggplot2) 
+library(dplyr) 
+library(tidyverse)
+
+#beer <- read.csv("C:/Users/David/Google Drive/Masters/Data Files/Beers.csv")
+#brew <- read.csv("C:/Users/David/Google Drive/Masters/Data Files/Breweries.csv")
+beer <- read.csv("C:/Git/MSDS_6306_Doing-Data-Science/Unit 8 and 9 Case Study 1/Beers.csv")
+brew <- read.csv("C:/Git/MSDS_6306_Doing-Data-Science/Unit 8 and 9 Case Study 1/Breweries.csv")
+head(beer,5)
+head(brew, 5)
+```
+
+_Data Tidying_
+```{r}
+# left join brew into beer based on brew_id, then renaming and sorting columns
+beer_df = merge(x=beer, y=brew, by.x="Brewery_id", by.y="Brew_ID", all.x=TRUE) %>% 
+  rename("Oz"=Ounces, "Brewery_ID"=Brewery_id, "Beer_Name"=Name.x, "Brewery_Name" =Name.y)
+beer_df <- beer_df[c(1,8,3,2,9,10,4,5,6,7)]
+# trimming leading and tailing spaces
+library(stringr)
+beer_df$State <- str_trim(beer_df$State,side="both")
+head(beer_df, 5)
+
+# checking for empty data and imputating NA values
+library(naniar)
+library(corrplot)
+library(imputeTS)
+vis_miss(beer_df) + xlab("Data Columns")
+
+# imputating NA values with the mean
+beer_df_cleaned <- na_mean(beer_df, option = "mean")
+head(beer_df_cleaned, 5)
+```
+
+_Analysis #1: How many breweries are present in each state?_
+```{r}
+# beer_df_cleaned %>% group_by(State, Brewery_ID) %>% tally summarise(brew_count_per_state = count())
+# beer_df_cleaned %>% arrange(desc(Max_IBU)) %>% ggplot(aes(x = State,fill=State)) + geom_histogram(stat="count") + theme(legend.position = "none") + ggtitle("# of Breweries per State")
+
+#beer_df_cleaned %>% group_by(State,Brewery_ID) %>% ggplot(aes(x = State,fill=State)) + geom_bar(stat="count") + theme(legend.position = "none") + ggtitle("# of Breweries per State")
+
+beer_df_cleaned %>%
+  group_by(State) %>%
+  summarise(distinct_breweries = n_distinct(Brewery_ID)) %>% 
+  mutate(State = fct_reorder(State, desc(distinct_breweries))) %>%
+  ggplot(aes(x = State, y = distinct_breweries, fill=State)) + 
+  geom_bar(stat="identity") + 
+  theme(legend.position = "none", axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 8)) + 
+  ggtitle("# of Breweries per State")
+  
+
+```
+_Analysis #2: Merge Beer and Breweries, print first and last 6 obs_
+```{r}
+head(beer_df_cleaned, 6)
+tail(beer_df_cleaned, 6)
+```
+_Analysis #3: Addressing missing values in each column_
+```{r}
+vis_miss(beer_df) + xlab("Data Columns")
+```
+_Analysis #4: Compute Median ABV and IBU for each state and plot_
+```{r}
+# creating logic column as calculation of medians and storing each as seperate dfs
+ABV_summary <- beer_df_cleaned %>% group_by(State) %>% summarise(Median_ABV=median(ABV), Max_ABV=max(ABV)) %>% as.data.frame()
+IBU_summary <- beer_df_cleaned %>% group_by(State) %>% summarise(Median_IBU=median(IBU), Max_IBU=max(IBU)) %>% as.data.frame()
+# joining the 2 dfs
+summary_df <- merge(x=ABV_summary, y=IBU_summary, by="State", all=TRUE)
+# scaling ABV and IBU for easier comparison
+summary_df$median_ABV_scaled = scale(summary_df$Median_ABV)
+summary_df$median_IBU_scaled = scale(summary_df$Median_IBU)
+summary_df$max_ABV_scaled = scale(summary_df$Max_ABV)
+summary_df$max_IBU_scaled = scale(summary_df$Max_IBU)
+head(summary_df, 5)
+#plotting side-by-side comparison by pivoting the median groups. Thank god for stack overflow for this.
+library(reshape)
+summary_df_pivot <- melt(summary_df)
+summary_df_pivot %>% filter(variable=="median_ABV_scaled" | variable=="median_IBU_scaled") %>% ggplot(aes(State,value,fill=variable)) + 
+  geom_bar(stat="identity", position="dodge") + 
+  theme(legend.position = "bottom", axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 8))
+```
+_Analysis #5: Which state has maximum ABV beer? Which state has most bitter(max IBU) beer?_
+```{r}
+# comparing ABV vs IBU max
+summary_df_pivot %>% filter(variable=="max_ABV_scaled" | variable=="max_IBU_scaled") %>% ggplot(aes(State,value,fill=variable)) + 
+  geom_bar(stat="identity", position="dodge") + 
+  theme(legend.position = "bottom", axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 8))
+
+# comparing ABV per state
+summary_df %>% arrange(desc(Max_ABV)) %>% mutate(State=fct_reorder(State, Max_ABV)) %>% 
+  ggplot(aes(State, Max_ABV,fill=State)) + 
+  geom_bar(stat="identity", width=0.8, position=position_dodge(1.5)) + 
+  theme(legend.position="none", plot.margin = unit(c(0,0,0,0), "cm"), axis.text.y = element_text(size = 8)) + 
+  scale_y_continuous("Max ABV (%)",label=scales::percent) + coord_flip() 
+
+# comparing IBU per state
+summary_df %>% arrange(desc(Max_IBU)) %>% mutate(State=fct_reorder(State, Max_IBU)) %>% 
+  ggplot(aes(State, Max_IBU,fill=State)) + geom_bar(stat="identity", width=0.8, position=position_dodge(1.5)) + 
+  ylab("Max IBU") + theme(legend.position="none", plot.margin = unit(c(0,0,0,0), "cm"), axis.text.y = element_text(size = 8)) +  coord_flip()
+
+
+
+# validating accuracy of data
+summary_df %>% filter(State=="CO")
+summary_df %>% filter(State=="OR")
+```
+
+_Analysis #6: Commenting on summary stats and distributino of ABV variable._
+```{r}
+# refer to Analysis #5 outputs
+```
+_Analysis #7: Relationship between IBU and ABV?_
+```{r}
+# logging variables to see if it helps improve correlation
+beer_df_cleaned$ABV.log <- log(beer_df_cleaned$ABV)
+beer_df_cleaned$IBU.log <- log(beer_df_cleaned$IBU)
+
+# install.packages("ggExtra")
+library(ggExtra)
+ABV_IBU_rel <- beer_df_cleaned %>% group_by(State) %>% ggplot(aes(x=ABV, y=IBU)) + geom_point() + geom_smooth(method="lm") +
+  scale_x_continuous("Max ABV (%)",label=scales::percent) + 
+  labs(title="Relationship between ABV and IBU",
+       caption="Source: beer, brewery data")
+ABV_IBU_rel_hist <- ggMarginal(ABV_IBU_rel, type="histogram", fill="slateblue")#, xparams=list(bins=10), yparams=list(bins=10))
+ABV_IBU_rel_hist
+
+cor(beer_df_cleaned$ABV, beer_df_cleaned$IBU)
+cor(beer_df_cleaned$ABV.log, beer_df_cleaned$IBU.log)
+cor(beer_df_cleaned$ABV, beer_df_cleaned$IBU.log)
+cor(beer_df_cleaned$ABV.log, beer_df_cleaned$IBU)
+```
+_Analysis #8: Difference of IBU and ABV between IPAs and other Ales?_
+```{r}
+# goal here is to use kNN to classify if a beer is Ale/IPA/Other based on it's ABV and IBU
+# viewing all types of beer styles
+beer_df_cleaned %>% group_by(Style) %>% select(Style)
+
+# converting existing beers into type categories
+beer_df_cleaned$Style[grep("Ale", beer_df_cleaned$Style)]
+beer_df_cleaned$Style[grep("IPA", beer_df_cleaned$Style)]
+beer_df_cleaned$Style[grep("Lager", beer_df_cleaned$Style)]
+
+# creating string match pattern
+beer_df_cleaned$Beer_Category <- ifelse(grepl("Ale", beer_df_cleaned$Style), "Ale", 
+                                        ifelse(grepl("IPA", beer_df_cleaned$Style) | grepl("India Pale Ales", beer_df_cleaned$Style), "IPA", "Other"))
+head(beer_df_cleaned, 50)
+
+# kNN
+library(class) # for knn
+library(caret) # for confusionMatrix
+match("ABV", names(beer_df_cleaned)) # column 7
+match("IBU", names(beer_df_cleaned)) # column 8
+# running kNN k=5
+knn.cv(beer_df_cleaned[,c(7,8)],beer_df_cleaned$Beer_Category,prob = TRUE, k = 7)
+beer_df_cleaned$pred_beer_cat <- knn.cv(beer_df_cleaned[,c(7,8)],beer_df_cleaned$Beer_Category,prob = TRUE, k = 7)
+confusionMatrix(table(beer_df_cleaned$pred_beer_cat,beer_df_cleaned$Beer_Category))
+```
+
+_Analysis #9: EDA inference_
+```{r}
+head(beer_df_cleaned, 5)
+```
