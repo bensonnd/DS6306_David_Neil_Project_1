@@ -17,13 +17,29 @@ library(forcats)
 
 #beer <- read.csv("C:/Users/David/Google Drive/Masters/Data Files/Beers.csv")
 #brew <- read.csv("C:/Users/David/Google Drive/Masters/Data Files/Breweries.csv")
-#beer <- read.csv("C:/Git/MSDS_6306_Doing-Data-Science/Unit 8 and 9 Case Study 1/Beers.csv")
-#brew <- read.csv("C:/Git/MSDS_6306_Doing-Data-Science/Unit 8 and 9 Case Study 1/Breweries.csv")
+beer <- read.csv("C:/Git/MSDS_6306_Doing-Data-Science/Unit 8 and 9 Case Study 1/Beers.csv")
+brew <- read.csv("C:/Git/MSDS_6306_Doing-Data-Science/Unit 8 and 9 Case Study 1/Breweries.csv")
 
-head(beer, 6)
-head(brew, 6)
 ```
+#### Reviewing the first 6 records of beer
+|Name 				          |Beer_ID   		  |ABV 		    |IBU 	  |Brewery_id 	  |Style 							            |Ounces	|
+|-----------------------|---------------|-----------|-------|---------------|-------------------------------|-------|
+|Pub Beer    			      |1436 			    |0.050  	  |NA     |409			      |American Pale Lager     		    |12		  |
+|Devil's Cup    		    |2265 			    |0.066  	  |NA     |178			      |American Pale Ale (APA) 		    |12		  |
+|Rise of the Phoenix    |2264 			    |0.071  	  |NA     |178			      |American IPA     				      |12		  |
+|Sinister    			      |2263 			    |0.090  	  |NA     |178			      |American Double / Imperial IPA |12		  |
+|Sex and Candy    		  |2262 			    |0.075  	  |NA     |178			      |American IPA     				      |12		  |
+|Black Exodus    		    |2261 			    |0.077  	  |NA     |178			      |Oatmeal Stout     				      |12    	|  
 
+#### Reviewing the first 6 records of brewery
+|Brew_ID|Name					             |City          |State |
+|-------|--------------------------|--------------|------|
+|1		  |NorthGate Brewing 		     |Minneapolis   |MN    |
+|2		  |Against the Grain Brewery |Louisville    |KY    |
+|3		  |Jack's Abby Craft Lagers  |Framingham    |MA    |
+|4		  |Mike Hess Brewing Company |San Diego     |CA    |
+|5		  |Fort Point Beer Company   |San Francisco |CA    |
+|6		  |COAST Brewing Company	   |Charleston    |SC    |     
 
 ## Analysis #1
 _Once our data has been imported we can now begin our analysis starting with our first question of determing how many breweries are 
@@ -47,15 +63,17 @@ library(stringr)
 
 ## Data Tidying
 
+
 # left join brew into beer based on brew_id, then renaming and ordering columns
 beer_df <- merge(x=beer, y=brew, by.x="Brewery_id", by.y="Brew_ID", all.x=TRUE) %>% 
   plyr::rename(c("Ounces"="Oz", "Brewery_id"="Brewery_ID", "Name.x"="Beer_Name","Name.y"="Brewery_Name"))
  
+
 # reording the columns
 beer_df <- beer_df[c(1,8,3,2,9,10,4,5,6,7)]
 
-# trimming leading and tailing spaces
 
+# trimming leading and tailing spaces
 beer_df$State <- str_trim(beer_df$State,side="both")
 
 head(beer_df, 6)
@@ -159,6 +177,7 @@ IBU missing 41.7% of data
 ABV missing 2.57% of data
 All other data noted as complete
 Missing data was filled in using the average ABV and average IBU by beer style
+
 
 
 ## Analysis #4
