@@ -1,4 +1,6 @@
 # Case Study - An analysis of Beer and Breweries for Budweiser  
+
+A review and analysis of beer and breweries by state. We will review missing data and how we filled it, number of breweries by state, sumarry statistics like medians and means of ABV and IBU at the beer level, and finally a review of the relationship IBUs between Ales and IPAs. 
  
 ## Data Sources  
 ### Beers.csv:  
