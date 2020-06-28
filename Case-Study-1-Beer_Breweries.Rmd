@@ -185,8 +185,8 @@ found that most beers fell within relative range of each other with only a handf
 ```{r,warning=FALSE,message=FALSE}
 
 # creating logic column as calculation of medians and storing each as seperate dfs
-ABV_summary <- beer_df_cleaned %>% group_by(State) %>% summarise(Median_ABV=median(ABV), Max_ABV=max(ABV)) %>% as.data.frame()
-IBU_summary <- beer_df_cleaned %>% group_by(State) %>% summarise(Median_IBU=median(IBU), Max_IBU=max(IBU)) %>% as.data.frame()
+ABV_summary <- beer_df_cleaned %>% group_by(State) %>% summarise(Median_ABV=median(ABV), Max_ABV=max(ABV), Mean_ABV=mean(ABV)) %>% as.data.frame()
+IBU_summary <- beer_df_cleaned %>% group_by(State) %>% summarise(Median_IBU=median(IBU), Max_IBU=max(IBU), Mean_IBU=mean(IBU)) %>% as.data.frame()
 
 
 # joining the 2 dfs
@@ -272,11 +272,13 @@ _Another aspect of the beer's ABV we looked into was the distribution and genera
 Here we found that most of the beers fell within a normal distribution with most beers generally being somewhat equal in its 
 alcoholic content. One thing to note in particular was how  _
 ```{r,warning=FALSE,message=FALSE}
-# refer to Analysis #5 outputss
+
 summary(beer_df_cleaned$ABV)
-# hist(beer_df_cleaned$ABV, breaks=10, border="black", col="#7CAE00", xlab="ABV (%)", main="Beer ABV Distribution")
-summary_ABV <- beer_df_cleaned %>% ggplot(aes(beer_df_cleaned$ABV,fill=State)) + geom_density()
+
+summary_ABV <- beer_df_cleaned %>% ggplot(aes(beer_df_cleaned$ABV)) +  geom_histogram(aes(y=..density..), bindwidth=50)+
+ geom_density()
 summary_ABV
+
 
 library(psych)
 describe(beer_df_cleaned$ABV)
@@ -343,5 +345,28 @@ confusionMatrix(table(beer_df_cleaned$pred_beer_cat,beer_df_cleaned$Beer_Categor
 ## Analysis #9 
 _EDA inference_
 ```{r}
-head(beer_df_cleaned, 5)
+#elevation <- read.csv("C:/Users/David/Google Drive/Masters/Data Files/Mean_Elevation_per_State.csv")
+elevation <- read.csv("C:/Git/DS6306_David_Neil_Project_1/DS6306_David_Neil_Project_1/Data Sources/Mean_Elevation_per_State.csv")
+elevation <- elevation %>% plyr::rename(c("Mean.elevationList.by.state"="Mean_Elevation"))
+elevation$Mean_Elevation <- gsub("feet", "", elevation$Mean_Elevation)
+elevation$Mean_Elevation <- gsub(",", "", elevation$Mean_Elevation)
+elevation$Mean_Elevation <- as.integer(elevation$Mean_Elevation)
+head(elevation, 52)
+
+elevation %>% ggplot(aes(x = Mean_Elevation)) + 
+  geom_histogram() + 
+  ggtitle("Distribution of Elevetation") +
+  ylab("Count") + xlab("Mean Elevation")
+
+elevation <- elevation %>% select(State_Abr, Mean_Elevation)
+
+summary_df <- merge(x=summary_df, y=elevation, by.x="State", by.y="State_Abr", all.x=TRUE)
+
+fakename <- summary_df %>% ggplot(aes(x=Mean_Elevation, y=m)) + geom_point() + geom_smooth(method="lm") +
+  labs(title="Relationship between ABV and IBU",
+       caption="Source: beer, brewery data")
+fakename_hist <- ggMarginal(fakename, type="histogram", fill="slateblue")#, xparams=list(bins=10), yparams=list(bins=10))
+fakename_hist
+
+
 ```
