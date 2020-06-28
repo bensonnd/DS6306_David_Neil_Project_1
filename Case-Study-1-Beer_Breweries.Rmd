@@ -131,7 +131,7 @@ summary_df %>% arrange(desc(Max_IBU)) %>% mutate(State=fct_reorder(State, Max_IB
 ```
 
 ## Analysis #6
-_Another aspect of the beer's ABV we looked into was the distribution and general statistics of ABV across all beers. Here we found that most of the beers fell within a normal distribution with most beers generally being somewhat equal in it's alcoholic content. One thing to note in particular was how _
+_Another aspect of the beer's ABV we looked into was the distribution and general statistics of ABV across all beers. Here we found that most of the beers fell within a normal distribution with most beers generally being somewhat equal in it's alcoholic content. One thing to note in particular was how  _
 ```{r,warning=FALSE,message=FALSE}
 # refer to Analysis #5 outputss
 summary(beer_df_cleaned$ABV)
