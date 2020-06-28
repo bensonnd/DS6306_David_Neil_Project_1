@@ -36,12 +36,12 @@
   
 |Brewery_ID |Brewery_Name 					|Beer_ID|Beer_Name          		|City 			|State  |ABV 	|IBU    |Style 									|Oz|
 |-----------|-------------------------------|-------|---------------------------|---------------|-------|-------|-------|---------------------------------------|--|
-|556        |Ukiah Brewing Company      	|98     |Pilsner Ukiah         		|Ukiah    		|CA 	|0.055  |NA     |German Pilsener 						|12|
-|557       	|Butternuts Beer and Ale      	|52  	|Heinnieweisse Weissebier 	|Garrattsville  |NY 	|0.049  |NA     |Hefeweizen 							|12|
-|557       	|Butternuts Beer and Ale      	|51     |Snapperhead IPA 			|Garrattsville  |NY 	|0.068  |NA     |American IPA 							|12|
-|557       	|Butternuts Beer and Ale      	|50     |Moo Thunder Stout 			|Garrattsville  |NY 	|0.049  |NA     |Milk / Sweet Stout 					|12|
-|557       	|Butternuts Beer and Ale      	|49     |Porkslap Pale Ale 			|Garrattsville  |NY 	|0.043  |NA 	|American Pale Ale (APA) 				|12|
-|558 		|Sleeping Lady Brewing Company  |30 	|Urban Wilderness Pale Ale  |Anchorage    	|AK 	|0.049  |NA     |English Pale Ale 						|12|
+|556        |Ukiah Brewing Company      	|98     |Pilsner Ukiah         		|Ukiah    		|CA 	|0.055  |34     |German Pilsener 						|12|
+|557       	|Butternuts Beer and Ale      	|52  	|Heinnieweisse Weissebier 	|Garrattsville  |NY 	|0.049  |17     |Hefeweizen 							|12|
+|557       	|Butternuts Beer and Ale      	|51     |Snapperhead IPA 			|Garrattsville  |NY 	|0.068  |67     |American IPA 							|12|
+|557       	|Butternuts Beer and Ale      	|50     |Moo Thunder Stout 			|Garrattsville  |NY 	|0.049  |25     |Milk / Sweet Stout 					|12|
+|557       	|Butternuts Beer and Ale      	|49     |Porkslap Pale Ale 			|Garrattsville  |NY 	|0.043  |44 	|American Pale Ale (APA) 				|12|
+|558 		|Sleeping Lady Brewing Company  |30 	|Urban Wilderness Pale Ale  |Anchorage    	|AK 	|0.049  |31     |English Pale Ale 						|12|
 
 ### Address the missing values in each column 
 &nbsp;&nbsp;&nbsp;&nbsp;IBU missing 41.7% of data  
