@@ -1,53 +1,52 @@
-Rank,State,Population,State_Abr,High point,Low point,Mean elevationList by state,,
-1,Alabama,"4,752,600",AL,"2,407 feet",Sea level,500 feet,,
-2,Alaska,"709,100",AK,"20,320 feet",Sea level,"1,900 feet",,
-3,Arizona,"7,004,300",AZ,"12,633 feet",70 feet,"4,100 feet",,
-4,Arkansas,"2,921,300",AR,"2,753 feet",55 feet,650 feet,,
-5,California,"38,745,900",CA,"14,494 feet",-282 feet,"2,900 feet",,
-6,Colorado,"5,555,200",CO,"14,440 feet","3,315 feet","6,800 feet",,
-7,Connecticut,"3,466,300",CT,"2,380 feet",Sea level,500 feet,,
-8,District of Columbia,"667,900",DC,410 feet,Sea level,150 feet,,
-9,Delaware,"937,700",DE,450 feet,Sea level,60 feet,,
-10,Florida,"20,843,500",FL,345 feet,Sea level,100 feet,,
-11,Georgia,"10,212,800",GA,"4,784 feet",Sea level,600 feet,,
-12,Hawaii,"1,354,800",HI,"13,796 feet",Sea level,"3,030 feet",,
-13,Idaho,"1,719,600",ID,"12,662 feet",710 feet,"5,000 feet",,
-14,Illinois,"12,438,400",IL,"1,235 feet",279 feet,600 feet,,
-15,Indiana,"6,487,100",IN,"1,257 feet",320 feet,700 feet,,
-16,Iowa,"3,056,800",IA,"1,670 feet",480 feet,"1,100 feet",,
-17,Kansas,"2,814,700",KS,"4,039 feet",679 feet,"2,000 feet",,
-18,Kentucky,"4,320,300",KY,"4,139 feet",257 feet,750 feet,,
-19,Louisiana,"4,519,300",LA,535 feet,-8 feet,100 feet,,
-20,Maine,"1,299,500",ME,"5,276 feet",Sea level,600 feet,,
-21,Maryland,"5,870,800",MD,"3,360 feet",Sea level,350 feet,,
-22,Massachusetts,"6,659,900",MA,"3,487 feet",Sea level,500 feet,,
-23,Michigan,"9,770,000",MI,"1,979 feet",572 feet,900 feet,,
-24,Minnesota,"5,489,000",MN,"2,301 feet",602 feet,"1,200 feet",,
-25,Mississippi,"2,879,400",MS,806 feet,Sea level,300 feet,,
-26,Missouri,"5,934,500",MO,"1,772 feet",230 feet,800 feet,,
-27,Montana,"1,034,000",MT,"12,799 feet","1,800 feet","3,400 feet",,
-28,Nebraska,"1,868,900",NB,"5,424 feet",840 feet,"2,600 feet",,
-29,Nevada,"2,983,400",NV,"13,140 feet",479 feet,"5,500 feet",,
-30,New Hampshire,"1,310,300",NH,"6,288 feet",Sea level,"1,000 feet",,
-31,New Jersey,"8,728,300",NJ,"1,803 feet",Sea level,250 feet,,
-32,New Mexico,"2,045,300",NM,"13,161 feet","2,842 feet","5,700 feet",,
-33,New York,"19,016,900",NY,"5,344 feet",Sea level,"1,000 feet",,
-34,North Carolina,"10,044,400",NC,"6,684 feet",Sea level,700 feet,,
-35,North Dakota,"730,600",ND,"3,506 feet",750 feet,"1,900 feet",,
-36,Ohio,"11,355,900",OH,"1,549 feet",455 feet,850 feet,,
-37,Oklahoma,"3,816,100",OK,"4,973 feet",289 feet,"1,300 feet",,
-38,Oregon,"4,110,800",OR,"11,239 feet",Sea level,"3,300 feet",,
-39,Pennsylvania,"12,388,100",PA,"3,213 feet",Sea level,"1,100 feet",,
-40,Rhode Island,"1,014,000",RI,812 feet,Sea level,200 feet,,
-41,South Carolina,"4,929,800",SC,"3,560 feet",Sea level,350 feet,,
-42,South Dakota,"848,700",SD,"7,242 feet",966 feet,"2,200 feet",,
-43,Tennessee,"6,586,400",TN,"6,643 feet",178 feet,900 feet,,
-44,Texas,"28,024,000",TX,"8,749 feet",Sea level,"1,700 feet",,
-45,Utah,"3,105,900",UT,"13,528 feet","2,000 feet","6,100 feet",,
-46,Vermont,"600,600",VT,"4,393 feet",95 feet,"1,000 feet",,
-47,Virginia,"8,182,100",VA,"5,729 feet",Sea level,950 feet,,
-48,Washington,"7,368,000",WA,"14,410 feet",Sea level,"1,700 feet",,
-49,West Virginia,"1,752,300",WV,"4,863 feet",240 feet,"1,500 feet",,
-50,Wisconsin,"5,662,800",WI,"1,951 feet",581 feet,"1,050 feet",,
-51,Wyoming,"560,300",WY,"13,804 feet","3,099 feet","6,700 feet",,
-,,,,,,,,
+Rank,State,Population,State_Abr,High point,Low point,Mean elevationList by state
+1,Alabama,"4,752,600",AL,"2,407 feet",Sea level,500 feet
+2,Alaska,"709,100",AK,"20,320 feet",Sea level,"1,900 feet"
+3,Arizona,"7,004,300",AZ,"12,633 feet",70 feet,"4,100 feet"
+4,Arkansas,"2,921,300",AR,"2,753 feet",55 feet,650 feet
+5,California,"38,745,900",CA,"14,494 feet",-282 feet,"2,900 feet"
+6,Colorado,"5,555,200",CO,"14,440 feet","3,315 feet","6,800 feet"
+7,Connecticut,"3,466,300",CT,"2,380 feet",Sea level,500 feet
+8,District of Columbia,"667,900",DC,410 feet,Sea level,150 feet
+9,Delaware,"937,700",DE,450 feet,Sea level,60 feet
+10,Florida,"20,843,500",FL,345 feet,Sea level,100 feet
+11,Georgia,"10,212,800",GA,"4,784 feet",Sea level,600 feet
+12,Hawaii,"1,354,800",HI,"13,796 feet",Sea level,"3,030 feet"
+13,Idaho,"1,719,600",ID,"12,662 feet",710 feet,"5,000 feet"
+14,Illinois,"12,438,400",IL,"1,235 feet",279 feet,600 feet
+15,Indiana,"6,487,100",IN,"1,257 feet",320 feet,700 feet
+16,Iowa,"3,056,800",IA,"1,670 feet",480 feet,"1,100 feet"
+17,Kansas,"2,814,700",KS,"4,039 feet",679 feet,"2,000 feet"
+18,Kentucky,"4,320,300",KY,"4,139 feet",257 feet,750 feet
+19,Louisiana,"4,519,300",LA,535 feet,-8 feet,100 feet
+20,Maine,"1,299,500",ME,"5,276 feet",Sea level,600 feet
+21,Maryland,"5,870,800",MD,"3,360 feet",Sea level,350 feet
+22,Massachusetts,"6,659,900",MA,"3,487 feet",Sea level,500 feet
+23,Michigan,"9,770,000",MI,"1,979 feet",572 feet,900 feet
+24,Minnesota,"5,489,000",MN,"2,301 feet",602 feet,"1,200 feet"
+25,Mississippi,"2,879,400",MS,806 feet,Sea level,300 feet
+26,Missouri,"5,934,500",MO,"1,772 feet",230 feet,800 feet
+27,Montana,"1,034,000",MT,"12,799 feet","1,800 feet","3,400 feet"
+28,Nebraska,"1,868,900",NE,"5,424 feet",840 feet,"2,600 feet"
+29,Nevada,"2,983,400",NV,"13,140 feet",479 feet,"5,500 feet"
+30,New Hampshire,"1,310,300",NH,"6,288 feet",Sea level,"1,000 feet"
+31,New Jersey,"8,728,300",NJ,"1,803 feet",Sea level,250 feet
+32,New Mexico,"2,045,300",NM,"13,161 feet","2,842 feet","5,700 feet"
+33,New York,"19,016,900",NY,"5,344 feet",Sea level,"1,000 feet"
+34,North Carolina,"10,044,400",NC,"6,684 feet",Sea level,700 feet
+35,North Dakota,"730,600",ND,"3,506 feet",750 feet,"1,900 feet"
+36,Ohio,"11,355,900",OH,"1,549 feet",455 feet,850 feet
+37,Oklahoma,"3,816,100",OK,"4,973 feet",289 feet,"1,300 feet"
+38,Oregon,"4,110,800",OR,"11,239 feet",Sea level,"3,300 feet"
+39,Pennsylvania,"12,388,100",PA,"3,213 feet",Sea level,"1,100 feet"
+40,Rhode Island,"1,014,000",RI,812 feet,Sea level,200 feet
+41,South Carolina,"4,929,800",SC,"3,560 feet",Sea level,350 feet
+42,South Dakota,"848,700",SD,"7,242 feet",966 feet,"2,200 feet"
+43,Tennessee,"6,586,400",TN,"6,643 feet",178 feet,900 feet
+44,Texas,"28,024,000",TX,"8,749 feet",Sea level,"1,700 feet"
+45,Utah,"3,105,900",UT,"13,528 feet","2,000 feet","6,100 feet"
+46,Vermont,"600,600",VT,"4,393 feet",95 feet,"1,000 feet"
+47,Virginia,"8,182,100",VA,"5,729 feet",Sea level,950 feet
+48,Washington,"7,368,000",WA,"14,410 feet",Sea level,"1,700 feet"
+49,West Virginia,"1,752,300",WV,"4,863 feet",240 feet,"1,500 feet"
+50,Wisconsin,"5,662,800",WI,"1,951 feet",581 feet,"1,050 feet"
+51,Wyoming,"560,300",WY,"13,804 feet","3,099 feet","6,700 feet"
