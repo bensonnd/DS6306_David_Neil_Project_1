@@ -41,6 +41,7 @@ brew <- read.csv("C:/Git/MSDS_6306_Doing-Data-Science/Unit 8 and 9 Case Study 1/
 |5		  |Fort Point Beer Company   |San Francisco |CA    |
 |6		  |COAST Brewing Company	   |Charleston    |SC    |     
 
+
 ## Analysis #1
 _Once our data has been imported we can now begin our analysis starting with our first question of determing how many breweries are 
 present in each state. After counting the number of unique breweries per state, we found that Colorado leads in having 47 breweries._
@@ -54,6 +55,7 @@ brew %>%
   theme(legend.position = "none", axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 8)) + 
   ggtitle("# of Breweries per State")
 ```
+
 
 ## Analysis #2
 _After the beer and brewery files have been loaded in as dataframes, we then joined, renamed and re-arranged the 2 datasets 
@@ -97,7 +99,6 @@ beer_df$State <- str_trim(beer_df$State,side="both")
 |557        |Butternuts Beer and Ale      	 |50     |Moo Thunder Stout 			   |Garrattsville  |NY 	   |0.049  |NA     |Milk / Sweet Stout 					         |12|
 |557        |Butternuts Beer and Ale      	 |49     |Porkslap Pale Ale 			   |Garrattsville  |NY 	   |0.043  |NA 	   |American Pale Ale (APA) 				     |12|
 |558 		    |Sleeping Lady Brewing Company   |30 	   |Urban Wilderness Pale Ale  |Anchorage    	 |AK 	   |0.049  |NA     |English Pale Ale 						         |12|
-
 
 
 ## Analysis #3
@@ -177,7 +178,6 @@ All other data noted as complete
 Missing data was filled in using the average ABV and average IBU by beer style
 
 
-
 ## Analysis #4
 _The Median alcohol content (ABV) and international bitterness unit (IBU) for each state was looked into by scaling the ABU and IBU coefficients 
 at a comparitive level due to how different each unit of measurement is. Additionally, we individually plotted the mean measurements per state and 
@@ -241,6 +241,7 @@ summary_df %>% arrange(desc(Median_IBU)) %>%
 
 ```
 
+
 ## Analysis #5
 _We next examined which state has the most alcoholic (ABV) most bitter (IBU) beer. 
 We found that Colorado has the most alcoholic beers while Oregon had the most bitter. _
@@ -267,6 +268,7 @@ summary_df %>% arrange(desc(Max_IBU)) %>% mutate(State=fct_reorder(State, Max_IB
   ylab("Max IBU") + theme(legend.position="none") + labs(title="Top 10 States with Most Bitter Beers")
 ```
 
+
 ## Analysis #6
 _Another aspect of the beer's ABV we looked into was the distribution and general statistics of ABV across all beers. 
 Here we found that most of the beers fell within a normal distribution with most beers generally being somewhat equal in its 
@@ -283,6 +285,7 @@ summary_ABV
 library(psych)
 describe(beer_df_cleaned$ABV)
 ```
+
 
 ## Analysis #7 
 _Relationship between IBU and ABV?_
@@ -307,6 +310,7 @@ cor(beer_df_cleaned$ABV.log, beer_df_cleaned$IBU.log)
 cor(beer_df_cleaned$ABV, beer_df_cleaned$IBU.log)
 cor(beer_df_cleaned$ABV.log, beer_df_cleaned$IBU)
 ```
+
 
 ## Analysis #8
 _Difference of IBU and ABV between IPAs and other Ales?_
@@ -342,31 +346,61 @@ beer_df_cleaned$pred_beer_cat <- knn.cv(beer_df_cleaned[,c(7,8)],beer_df_cleaned
 confusionMatrix(table(beer_df_cleaned$pred_beer_cat,beer_df_cleaned$Beer_Category))
 ```
 
+
 ## Analysis #9 
 _EDA inference_
 ```{r}
-#elevation <- read.csv("C:/Users/David/Google Drive/Masters/Data Files/Mean_Elevation_per_State.csv")
-elevation <- read.csv("C:/Git/DS6306_David_Neil_Project_1/DS6306_David_Neil_Project_1/Data Sources/Mean_Elevation_per_State.csv")
-elevation <- elevation %>% plyr::rename(c("Mean.elevationList.by.state"="Mean_Elevation"))
-elevation$Mean_Elevation <- gsub("feet", "", elevation$Mean_Elevation)
-elevation$Mean_Elevation <- gsub(",", "", elevation$Mean_Elevation)
-elevation$Mean_Elevation <- as.integer(elevation$Mean_Elevation)
-head(elevation, 52)
+# loading state summary data - population and elevation
+state_data <- read.csv("C:/Git/DS6306_David_Neil_Project_1/DS6306_David_Neil_Project_1/Data Sources/Mean_Elevation_per_State.csv")
+state_data <- state_data %>% plyr::rename(c("Mean.elevationList.by.state"="Mean_Elevation"))
 
-elevation %>% ggplot(aes(x = Mean_Elevation)) + 
-  geom_histogram() + 
-  ggtitle("Distribution of Elevetation") +
-  ylab("Count") + xlab("Mean Elevation")
+# tidying up some of the data
+state_data$Mean_Elevation <- gsub("feet", "", state_data$Mean_Elevation)
+state_data$Mean_Elevation <- gsub(",", "", state_data$Mean_Elevation)
+state_data$Mean_Elevation <- as.integer(state_data$Mean_Elevation)
+state_data$Population <- gsub(",", "", state_data$Population)
+state_data$Population <- as.integer(state_data$Population)
 
-elevation <- elevation %>% select(State_Abr, Mean_Elevation)
 
-summary_df <- merge(x=summary_df, y=elevation, by.x="State", by.y="State_Abr", all.x=TRUE)
+# adding elevation and population datra to summary_df
+state_data <- state_data %>% select(State, State_Abr, Mean_Elevation, Population)
+summary_df <- merge(x=summary_df, y=state_data, by.x="State", by.y="State_Abr", all.x=TRUE)
 
-fakename <- summary_df %>% ggplot(aes(x=Mean_Elevation, y=m)) + geom_point() + geom_smooth(method="lm") +
-  labs(title="Relationship between ABV and IBU",
-       caption="Source: beer, brewery data")
-fakename_hist <- ggMarginal(fakename, type="histogram", fill="slateblue")#, xparams=list(bins=10), yparams=list(bins=10))
-fakename_hist
 
+# counting distinct number of beers and breweries per state
+state_beer_summary <- beer_df_cleaned %>% group_by(State) %>% summarise(Beers = n_distinct(Beer_ID))
+state_brewery_summary <- beer_df_cleaned %>% group_by(State) %>% summarise(Breweries = n_distinct(Brewery_ID))
+
+
+# adding distinct number of beers and breweries to summary_df
+summary_df <- merge(x=summary_df, y=state_beer_summary, by.x="State", by.y="State", all.x=TRUE)
+summary_df <- merge(x=summary_df, y=state_brewery_summary, by.x="State", by.y="State", all.x=TRUE)
+
+
+# adding beers per million and breweries per million
+summary_df <- summary_df %>% mutate(per_capita_beers = (Beers / (Population/1000000)))
+summary_df <- summary_df %>% mutate(per_capita_breweries = (Breweries / (Population/1000000)))
+
+summary_df <- summary_df %>% plyr::rename(c("State"="State_Abvr", "State.y"="State"))
+
+# reording the columns
+summary_df <- summary_df[c(12,1,2,3,4,5,6,7,8,9,10,11,13,14,15,17,16,18)]
+
+library(maps)
+us_states <- map_data("state")
+
+summary_df$State_lwrcase <- tolower(summary_df$State)
+head(state_data, 5)
+
+us_states_data <- merge(x=us_states, y=summary_df, by.x="region", by.y="State_lwrcase")
+
+
+p0 <- ggplot(data = us_states_data,mapping = aes(x = long, y = lat, group = group, fill = per_capita_breweries))
+
+p1 <- p0 + geom_polygon(color = "gray90", size = 0.1) + coord_map(projection = "albers", lat0 = 39, lat1 = 45) + labs(title = "x") + theme_map() + labs(fill = "Percent")
+p1
+
+p2 <- p1 + scale_fill_gradient(low = "white", high = "#CB454A") + labs(title = "Per Capita Breweries per 1M Drinking Age Adults") + theme_map() + labs(fill = "Percent")
+p2
 
 ```
