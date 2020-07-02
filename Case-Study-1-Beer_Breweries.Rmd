@@ -17,12 +17,29 @@ library(forcats)
 
 #beer <- read.csv("C:/Users/David/Google Drive/Masters/Data Files/Beers.csv")
 #brew <- read.csv("C:/Users/David/Google Drive/Masters/Data Files/Breweries.csv")
-#beer <- read.csv("C:/Git/MSDS_6306_Doing-Data-Science/Unit 8 and 9 Case Study 1/Beers.csv")
-#brew <- read.csv("C:/Git/MSDS_6306_Doing-Data-Science/Unit 8 and 9 Case Study 1/Breweries.csv")
+beer <- read.csv("C:/Git/MSDS_6306_Doing-Data-Science/Unit 8 and 9 Case Study 1/Beers.csv")
+brew <- read.csv("C:/Git/MSDS_6306_Doing-Data-Science/Unit 8 and 9 Case Study 1/Breweries.csv")
 
-head(beer, 6)
-head(brew, 6)
 ```
+#### Reviewing the first 6 records of beer
+|Name 				          |Beer_ID   		  |ABV 		    |IBU 	  |Brewery_id 	  |Style 							            |Ounces	|
+|-----------------------|---------------|-----------|-------|---------------|-------------------------------|-------|
+|Pub Beer    			      |1436 			    |0.050  	  |NA     |409			      |American Pale Lager     		    |12		  |
+|Devil's Cup    		    |2265 			    |0.066  	  |NA     |178			      |American Pale Ale (APA) 		    |12		  |
+|Rise of the Phoenix    |2264 			    |0.071  	  |NA     |178			      |American IPA     				      |12		  |
+|Sinister    			      |2263 			    |0.090  	  |NA     |178			      |American Double / Imperial IPA |12		  |
+|Sex and Candy    		  |2262 			    |0.075  	  |NA     |178			      |American IPA     				      |12		  |
+|Black Exodus    		    |2261 			    |0.077  	  |NA     |178			      |Oatmeal Stout     				      |12    	|  
+
+#### Reviewing the first 6 records of brewery
+|Brew_ID|Name					             |City          |State |
+|-------|--------------------------|--------------|------|
+|1		  |NorthGate Brewing 		     |Minneapolis   |MN    |
+|2		  |Against the Grain Brewery |Louisville    |KY    |
+|3		  |Jack's Abby Craft Lagers  |Framingham    |MA    |
+|4		  |Mike Hess Brewing Company |San Diego     |CA    |
+|5		  |Fort Point Beer Company   |San Francisco |CA    |
+|6		  |COAST Brewing Company	   |Charleston    |SC    |     
 
 
 ## Analysis #1
@@ -39,6 +56,7 @@ brew %>%
   ggtitle("# of Breweries per State")
 ```
 
+
 ## Analysis #2
 _After the beer and brewery files have been loaded in as dataframes, we then joined, renamed and re-arranged the 2 datasets 
 together to create a single tidy source of data for ease of use. Output of final dataset provided below._
@@ -47,19 +65,19 @@ library(stringr)
 
 ## Data Tidying
 
+
 # left join brew into beer based on brew_id, then renaming and ordering columns
 beer_df <- merge(x=beer, y=brew, by.x="Brewery_id", by.y="Brew_ID", all.x=TRUE) %>% 
   plyr::rename(c("Ounces"="Oz", "Brewery_id"="Brewery_ID", "Name.x"="Beer_Name","Name.y"="Brewery_Name"))
  
+
 # reording the columns
 beer_df <- beer_df[c(1,8,3,2,9,10,4,5,6,7)]
 
-# trimming leading and tailing spaces
 
+# trimming leading and tailing spaces
 beer_df$State <- str_trim(beer_df$State,side="both")
 
-head(beer_df, 6)
-tail(beer_df, 6)
 ```
 
 #### Reviewing the first 6 records after join
@@ -81,7 +99,6 @@ tail(beer_df, 6)
 |557        |Butternuts Beer and Ale      	 |50     |Moo Thunder Stout 			   |Garrattsville  |NY 	   |0.049  |NA     |Milk / Sweet Stout 					         |12|
 |557        |Butternuts Beer and Ale      	 |49     |Porkslap Pale Ale 			   |Garrattsville  |NY 	   |0.043  |NA 	   |American Pale Ale (APA) 				     |12|
 |558 		    |Sleeping Lady Brewing Company   |30 	   |Urban Wilderness Pale Ale  |Anchorage    	 |AK 	   |0.049  |NA     |English Pale Ale 						         |12|
-
 
 
 ## Analysis #3
@@ -168,8 +185,8 @@ found that most beers fell within relative range of each other with only a handf
 ```{r,warning=FALSE,message=FALSE}
 
 # creating logic column as calculation of medians and storing each as seperate dfs
-ABV_summary <- beer_df_cleaned %>% group_by(State) %>% summarise(Median_ABV=median(ABV), Max_ABV=max(ABV)) %>% as.data.frame()
-IBU_summary <- beer_df_cleaned %>% group_by(State) %>% summarise(Median_IBU=median(IBU), Max_IBU=max(IBU)) %>% as.data.frame()
+ABV_summary <- beer_df_cleaned %>% group_by(State) %>% summarise(Median_ABV=median(ABV), Max_ABV=max(ABV), Mean_ABV=mean(ABV)) %>% as.data.frame()
+IBU_summary <- beer_df_cleaned %>% group_by(State) %>% summarise(Median_IBU=median(IBU), Max_IBU=max(IBU), Mean_IBU=mean(IBU)) %>% as.data.frame()
 
 
 # joining the 2 dfs
@@ -180,9 +197,19 @@ summary_df$median_ABV.scaled = scale(summary_df$Median_ABV)
 summary_df$median_IBU.scaled = scale(summary_df$Median_IBU)
 summary_df$max_ABV.scaled= scale(summary_df$Max_ABV)
 summary_df$max_IBU.scaled = scale(summary_df$Max_IBU)
-head(summary_df, 5)
+```
+
+#### Reviewing summary_df
+|State|Median_ABV|Max_ABV|Median_IBU|Max_IBU| median_ABV.scaled|median_IBU.scaled| max_ABV.scaled| max_IBU.scaled|
+|-----|----------|-------|----------|-------|------------------|-----------------|---------------|---------------|
+|AK   |0.056     |0.068  |34.0      |71     |0.006867089       |0.02227067       |-1.4023857     |-1.1581394     |
+|AL   |0.060     |0.093  |39.5      |103    |0.940791179       |0.71637307       |0.2702446      |0.4235204      |
+|AR   |0.052     |0.061  |36.0      |46     |-0.927057001      |0.27467154       |-1.8707222     |-2.3938111     |
+|AZ   |0.057     |0.095  |22.0      |99     |0.240348111       |0.77947329       |0.6716758      |1.0166429      |
+|CA   |0.058     |0.099  |40.0      |115    |0.473829134       |-1.49213459      |0.4040550      |0.2258130      |
 
 
+```{r,warning=FALSE,message=FALSE}
 #comparing median ABV vs IBU per state
 library(reshape)
 summary_df_pivot <- melt(summary_df)
@@ -214,6 +241,7 @@ summary_df %>% arrange(desc(Median_IBU)) %>%
 
 ```
 
+
 ## Analysis #5
 _We next examined which state has the most alcoholic (ABV) most bitter (IBU) beer. 
 We found that Colorado has the most alcoholic beers while Oregon had the most bitter. _
@@ -240,20 +268,24 @@ summary_df %>% arrange(desc(Max_IBU)) %>% mutate(State=fct_reorder(State, Max_IB
   ylab("Max IBU") + theme(legend.position="none") + labs(title="Top 10 States with Most Bitter Beers")
 ```
 
+
 ## Analysis #6
 _Another aspect of the beer's ABV we looked into was the distribution and general statistics of ABV across all beers. 
 Here we found that most of the beers fell within a normal distribution with most beers generally being somewhat equal in its 
 alcoholic content. One thing to note in particular was how  _
 ```{r,warning=FALSE,message=FALSE}
-# refer to Analysis #5 outputss
+
 summary(beer_df_cleaned$ABV)
-# hist(beer_df_cleaned$ABV, breaks=10, border="black", col="#7CAE00", xlab="ABV (%)", main="Beer ABV Distribution")
-summary_ABV <- beer_df_cleaned %>% ggplot(aes(beer_df_cleaned$ABV,fill=State)) + geom_density()
+
+summary_ABV <- beer_df_cleaned %>% ggplot(aes(beer_df_cleaned$ABV)) +  geom_histogram(aes(y=..density..), bindwidth=50)+
+ geom_density()
 summary_ABV
+
 
 library(psych)
 describe(beer_df_cleaned$ABV)
 ```
+
 
 ## Analysis #7 
 _Relationship between IBU and ABV?_
@@ -278,6 +310,7 @@ cor(beer_df_cleaned$ABV.log, beer_df_cleaned$IBU.log)
 cor(beer_df_cleaned$ABV, beer_df_cleaned$IBU.log)
 cor(beer_df_cleaned$ABV.log, beer_df_cleaned$IBU)
 ```
+
 
 ## Analysis #8
 _Difference of IBU and ABV between IPAs and other Ales?_
@@ -313,8 +346,61 @@ beer_df_cleaned$pred_beer_cat <- knn.cv(beer_df_cleaned[,c(7,8)],beer_df_cleaned
 confusionMatrix(table(beer_df_cleaned$pred_beer_cat,beer_df_cleaned$Beer_Category))
 ```
 
+
 ## Analysis #9 
 _EDA inference_
 ```{r}
-head(beer_df_cleaned, 5)
+# loading state summary data - population and elevation
+state_data <- read.csv("C:/Git/DS6306_David_Neil_Project_1/DS6306_David_Neil_Project_1/Data Sources/Mean_Elevation_per_State.csv")
+state_data <- state_data %>% plyr::rename(c("Mean.elevationList.by.state"="Mean_Elevation"))
+
+# tidying up some of the data
+state_data$Mean_Elevation <- gsub("feet", "", state_data$Mean_Elevation)
+state_data$Mean_Elevation <- gsub(",", "", state_data$Mean_Elevation)
+state_data$Mean_Elevation <- as.integer(state_data$Mean_Elevation)
+state_data$Population <- gsub(",", "", state_data$Population)
+state_data$Population <- as.integer(state_data$Population)
+
+
+# adding elevation and population datra to summary_df
+state_data <- state_data %>% select(State, State_Abr, Mean_Elevation, Population)
+summary_df <- merge(x=summary_df, y=state_data, by.x="State", by.y="State_Abr", all.x=TRUE)
+
+
+# counting distinct number of beers and breweries per state
+state_beer_summary <- beer_df_cleaned %>% group_by(State) %>% summarise(Beers = n_distinct(Beer_ID))
+state_brewery_summary <- beer_df_cleaned %>% group_by(State) %>% summarise(Breweries = n_distinct(Brewery_ID))
+
+
+# adding distinct number of beers and breweries to summary_df
+summary_df <- merge(x=summary_df, y=state_beer_summary, by.x="State", by.y="State", all.x=TRUE)
+summary_df <- merge(x=summary_df, y=state_brewery_summary, by.x="State", by.y="State", all.x=TRUE)
+
+
+# adding beers per million and breweries per million
+summary_df <- summary_df %>% mutate(per_capita_beers = (Beers / (Population/1000000)))
+summary_df <- summary_df %>% mutate(per_capita_breweries = (Breweries / (Population/1000000)))
+
+summary_df <- summary_df %>% plyr::rename(c("State"="State_Abvr", "State.y"="State"))
+
+# reording the columns
+summary_df <- summary_df[c(12,1,2,3,4,5,6,7,8,9,10,11,13,14,15,17,16,18)]
+
+library(maps)
+us_states <- map_data("state")
+
+summary_df$State_lwrcase <- tolower(summary_df$State)
+head(state_data, 5)
+
+us_states_data <- merge(x=us_states, y=summary_df, by.x="region", by.y="State_lwrcase")
+
+
+p0 <- ggplot(data = us_states_data,mapping = aes(x = long, y = lat, group = group, fill = per_capita_breweries))
+
+p1 <- p0 + geom_polygon(color = "gray90", size = 0.1) + coord_map(projection = "albers", lat0 = 39, lat1 = 45) + labs(title = "x") + theme_map() + labs(fill = "Percent")
+p1
+
+p2 <- p1 + scale_fill_gradient(low = "white", high = "#CB454A") + labs(title = "Per Capita Breweries per 1M Drinking Age Adults") + theme_map() + labs(fill = "Percent")
+p2
+
 ```
