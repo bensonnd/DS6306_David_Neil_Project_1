@@ -15,10 +15,10 @@ library(tidyverse)
 library(forcats)
 
 
-#beer <- read.csv("C:/Users/David/Google Drive/Masters/Data Files/Beers.csv")
-#brew <- read.csv("C:/Users/David/Google Drive/Masters/Data Files/Breweries.csv")
-beer <- read.csv("C:/Git/MSDS_6306_Doing-Data-Science/Unit 8 and 9 Case Study 1/Beers.csv")
-brew <- read.csv("C:/Git/MSDS_6306_Doing-Data-Science/Unit 8 and 9 Case Study 1/Breweries.csv")
+beer <- read.csv("C:/Users/David/Google Drive/Masters/Data Files/Beers.csv")
+brew <- read.csv("C:/Users/David/Google Drive/Masters/Data Files/Breweries.csv")
+# beer <- read.csv("C:/Git/MSDS_6306_Doing-Data-Science/Unit 8 and 9 Case Study 1/Beers.csv")
+# brew <- read.csv("C:/Git/MSDS_6306_Doing-Data-Science/Unit 8 and 9 Case Study 1/Breweries.csv")
 
 ```
 #### Reviewing the first 6 records of beer
@@ -58,8 +58,7 @@ brew %>%
 
 
 ## Analysis #2
-_After the beer and brewery files have been loaded in as dataframes, we then joined, renamed and re-arranged the 2 datasets 
-together to create a single tidy source of data for ease of use. Output of final dataset provided below._
+_After the beer and brewery files have been loaded in as dataframes, we then joined, renamed and re-arranged the 2 datasets together to create a single tidy source of data for ease of use. Output of final dataset provided below._
 ```{r,warning=FALSE,message=FALSE}
 library(stringr)
 
@@ -327,31 +326,57 @@ beer_df_cleaned %>% group_by(Style) %>% select(Style)
 # creating string match pattern
 beer_df_cleaned$Beer_Category <- ifelse(grepl("Ale", beer_df_cleaned$Style), "Ale", 
                                         ifelse(grepl("IPA", beer_df_cleaned$Style) | grepl("India Pale Ales", beer_df_cleaned$Style), "IPA", "Other"))
-head(beer_df_cleaned, 5)
+beer_df_cleaned$Beer_Category <- as.factor(beer_df_cleaned$Beer_Category)
+beer_df_knn <- beer_df_cleaned %>% filter(Beer_Category!="Other")
 
-beer_df_cleaned %>% group_by(Style) %>% select(IBU, Style) %>% summarise(Mean_IBU=mean(IBU)) %>% ggplot(aes(x=Style, y=Mean_IBU))+geom_point() + geom_smooth(method='lm')
-head(beer_df_cleaned, 5)
+# knn.cv(beer_df_cleaned[,c(7,8)],beer_df_cleaned$Beer_Category,prob = TRUE, k = 5)
+beer_df_cleaned$pred_beer_cat <- knn.cv(beer_df_cleaned[,c(7,8)],beer_df_cleaned$Beer_Category,prob = TRUE, k = 5)
+confusionMatrix(table(beer_df_cleaned$pred_beer_cat,beer_df_cleaned$Beer_Category))
+
 
 # kNN
 library(class) # for knn
 library(caret) # for confusionMatrix
 # match("ABV", names(beer_df_cleaned)) # column 7
 # match("IBU", names(beer_df_cleaned)) # column 8
-# running kNN k=5
 
+# tuning KNN for k
+# dim(beer_df_cleaned)
+set.seed(27)
+iterations = 100
+numks = 90
+splitPerc = .70
 
-# knn.cv(beer_df_cleaned[,c(7,8)],beer_df_cleaned$Beer_Category,prob = TRUE, k = 5)
-beer_df_cleaned$pred_beer_cat <- knn.cv(beer_df_cleaned[,c(7,8)],beer_df_cleaned$Beer_Category,prob = TRUE, k = 5)
-
-confusionMatrix(table(beer_df_cleaned$pred_beer_cat,beer_df_cleaned$Beer_Category))
+masterAcc = matrix(nrow = iterations, ncol = numks)
+for(j in 1:iterations)
+{
+  trainIndices = sample(1:dim(beer_df_cleaned)[1],round(splitPerc * dim(beer_df_cleaned)[1]))
+  train = beer_df_cleaned[trainIndices,]
+  test = beer_df_cleaned[-trainIndices,]
+  for(i in 1:numks)
+  {
+    classifications = knn(train[,c(7,8)],test[,c(7,8)],train$Beer_Category, prob = TRUE, k = i)
+    table(classifications,test$Beer_Category)
+    CM = confusionMatrix(table(classifications,test$Beer_Category))
+    masterAcc[j,i] = CM$overall[1]
+  }
+  
+}
+MeanAcc = colMeans(masterAcc)
+MeanAcc
+mean(masterAcc)
+which.max(MeanAcc)
+max(MeanAcc)
+plot(seq(1,numks,1),MeanAcc, type = "l")
 ```
 
 
 ## Analysis #9 
 _EDA inference_
-```{r}
+```{r,warning=FALSE,message=FALSE}
 # loading state summary data - population and elevation
-state_data <- read.csv("C:/Git/DS6306_David_Neil_Project_1/DS6306_David_Neil_Project_1/Data Sources/Mean_Elevation_per_State.csv")
+state_data <- read.csv("C:/Users/David/Google Drive/Code & Programming/GitHub/MSDS_6306_Doing-Data-Science_Case_Study_1/DS6306_David_Neil_Project_1/Data Sources/Mean_Elevation_per_State.csv")
+# state_data <- read.csv("C:/Git/DS6306_David_Neil_Project_1/DS6306_David_Neil_Project_1/Data Sources/Mean_Elevation_per_State.csv")
 state_data <- state_data %>% plyr::rename(c("Mean.elevationList.by.state"="Mean_Elevation"))
 
 # tidying up some of the data
@@ -397,8 +422,8 @@ us_states_data <- merge(x=us_states, y=summary_df, by.x="region", by.y="State_lw
 
 p0 <- ggplot(data = us_states_data,mapping = aes(x = long, y = lat, group = group, fill = per_capita_breweries))
 
-p1 <- p0 + geom_polygon(color = "gray90", size = 0.1) + coord_map(projection = "albers", lat0 = 39, lat1 = 45) + labs(title = "x") + theme_map() + labs(fill = "Percent")
-p1
+# p1 <- p0 + geom_polygon(color = "gray90", size = 0.1) + coord_map(projection = "albers", lat0 = 39, lat1 = 45) + labs(title = "x") + theme_map() + labs(fill = "Percent")
+# p1
 
 p2 <- p1 + scale_fill_gradient(low = "white", high = "#CB454A") + labs(title = "Per Capita Breweries per 1M Drinking Age Adults") + theme_map() + labs(fill = "Percent")
 p2
