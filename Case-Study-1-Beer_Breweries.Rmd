@@ -380,7 +380,7 @@ lines(lstat_grid$lstat, pred_001$pred, col = "darkorange", lwd = 0.25)
 
 
 ## Analysis #9 
-_EDA inference_
+_With Colorade leading the states in total number of breweries, it has 8.5 breweries per 1M adults over the age of 21. Only Vermont, Alaska, and Montana rank ahead of Colorado in breweries per capita. Note that Vermont, Alaska, and Montana are all low population states. When looking for a place to build a new brewery, we can see two advantages - moving into states with high population and high per capita breweries, or high population and low per capita breweries. For the first option, there will be stiff competition, but a beer thirsty population and often times beer destination, whereas with the second option, you could establish a market with little or no competition that could eventually become a beer attraction._
 ```{r,warning=FALSE,message=FALSE}
 # loading state summary data - population and elevation
 state_data <- read.csv("C:/Users/David/Google Drive/Code & Programming/GitHub/MSDS_6306_Doing-Data-Science_Case_Study_1/DS6306_David_Neil_Project_1/Data Sources/Mean_Elevation_per_State.csv")
@@ -420,7 +420,7 @@ summary_df <- summary_df %>% plyr::rename(c("State"="State_Abvr", "State.y"="Sta
 summary_df <- summary_df[c(12,1,2,3,4,5,6,7,8,9,10,11,13,14,15,17,16,18)]
 
 library(maps)
-us_states <- map_data("state")
+us_states <- map_data("state") 
 
 summary_df$State_lwrcase <- tolower(summary_df$State)
 head(state_data, 5)
