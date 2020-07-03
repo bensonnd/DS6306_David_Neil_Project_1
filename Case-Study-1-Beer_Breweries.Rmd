@@ -271,7 +271,8 @@ summary_df %>% arrange(desc(Max_IBU)) %>% mutate(State=fct_reorder(State, Max_IB
 ## Analysis #6
 _Another aspect of the beer's ABV we looked into was the distribution and general statistics of ABV across all beers. 
 Here we found that most of the beers fell within a normal distribution with most beers generally being somewhat equal in its 
-alcoholic content. One thing to note in particular was how  _
+alcoholic content. One thing to note in particular was the right skew in the distribution since the default deifition of "Beer" under federal law is 
+anything greater than 0.5% alcohol thus explaning the skewness._
 ```{r,warning=FALSE,message=FALSE}
 
 summary(beer_df_cleaned$ABV)
@@ -280,16 +281,16 @@ summary_ABV <- beer_df_cleaned %>% ggplot(aes(beer_df_cleaned$ABV)) +  geom_hist
  geom_density()
 summary_ABV
 
-
 library(psych)
 describe(beer_df_cleaned$ABV)
 ```
 
 
 ## Analysis #7 
-_Relationship between IBU and ABV?_
+_After examining how IBU differs from ABV from varying perspectives, we wanted to examine more closely the relationship between IBU and ABV. 
+This was done simply by plotting each variable without any transformations applied as interpretation was important. We found that after even after imputing IBU values
+with the mean per beer style, there is still mild evidence supporting a linear relationship between the two (corr=0.539)._
 ```{r,warning=FALSE,message=FALSE}
-
 # logging variables to see if it helps improve correlation
 beer_df_cleaned$ABV.log <- log(beer_df_cleaned$ABV)
 beer_df_cleaned$IBU.log <- log(beer_df_cleaned$IBU)
@@ -312,33 +313,37 @@ cor(beer_df_cleaned$ABV.log, beer_df_cleaned$IBU)
 
 
 ## Analysis #8
-_Difference of IBU and ABV between IPAs and other Ales?_
+_After analyzing the differences between IBU and ABV factors, we then wanted to investigate how those differnces differed among
+different styles of beer, namely IPAs and Ale's. To do this, we utilized KNN to classify and see how well IBU and ABV would predict those beer styles. We first started by creating a higher grouping of all beer styles based on their Styles, removing all other descriptive information (ex. 'Pumpkin' Ales, 'Bitter' IPAs, etc.). Once the classification of true factors were created, we then further filtered out all non-IPA and non-Ale beer styles to exclusively see how well those variables would predict. After some tuning for 'k', we found that there was a strong relationship between IBU and ABV in respects to classifying beer styles (Accuracy ~ 0.91)._
 ```{r,warning=FALSE,message=FALSE}
 # goal here is to use kNN to classify if a beer is Ale/IPA/Other based on it's ABV and IBU
-# viewing all types of beer styles
-beer_df_cleaned %>% group_by(Style) %>% select(Style)
-
-# # converting existing beers into type categories
-# beer_df_cleaned$Style[grep("Ale", beer_df_cleaned$Style)]
-# beer_df_cleaned$Style[grep("IPA", beer_df_cleaned$Style)]
-# beer_df_cleaned$Style[grep("Lager", beer_df_cleaned$Style)]
-
 # creating string match pattern
 beer_df_cleaned$Beer_Category <- ifelse(grepl("Ale", beer_df_cleaned$Style), "Ale", 
                                         ifelse(grepl("IPA", beer_df_cleaned$Style) | grepl("India Pale Ales", beer_df_cleaned$Style), "IPA", "Other"))
 beer_df_cleaned$Beer_Category <- as.factor(beer_df_cleaned$Beer_Category)
+
+# filtering out non-Ale and non-IPA beers to see if it improves prediction accuracy
 beer_df_knn <- beer_df_cleaned %>% filter(Beer_Category!="Other")
+set.seed(27)
+splitPerc = .70
 
-# knn.cv(beer_df_cleaned[,c(7,8)],beer_df_cleaned$Beer_Category,prob = TRUE, k = 5)
-beer_df_cleaned$pred_beer_cat <- knn.cv(beer_df_cleaned[,c(7,8)],beer_df_cleaned$Beer_Category,prob = TRUE, k = 5)
-confusionMatrix(table(beer_df_cleaned$pred_beer_cat,beer_df_cleaned$Beer_Category))
-
+beer_df_knn_index = sample(1:dim(beer_df_knn)[1],round(splitPerc * dim(beer_df_knn)[1]))
+beer_df_knn_train = beer_df_knn[beer_df_knn_index,]
+beer_df_knn_test = beer_df_knn[-beer_df_knn_index,]
 
 # kNN
 library(class) # for knn
 library(caret) # for confusionMatrix
-# match("ABV", names(beer_df_cleaned)) # column 7
-# match("IBU", names(beer_df_cleaned)) # column 8
+
+#KNN based including "Other" style groupings, acc~.72
+beer_df_cleaned$pred_beer_cat <- knn.cv(beer_df_cleaned[,c(7,8)],beer_df_cleaned$Beer_Category,prob = TRUE, k = 5)
+beer_df_cleaned_confusionMatrix <- confusionMatrix(table(beer_df_cleaned$pred_beer_cat,beer_df_cleaned$Beer_Category))
+beer_df_cleaned_confusionMatrix$overall[1]
+
+#KNN based excluding "Other" style groupings, acc~.89
+beer_df_knn$pred_beer_cat <- knn.cv(beer_df_knn[,c(7,8)],beer_df_knn$Beer_Category,prob = TRUE, k = 6)
+beer_df_knn_confusionMatrix <- confusionMatrix(table(beer_df_knn$pred_beer_cat,beer_df_knn$Beer_Category))
+beer_df_knn_confusionMatrix$overall[1]
 
 # tuning KNN for k
 # dim(beer_df_cleaned)
@@ -350,9 +355,9 @@ splitPerc = .70
 masterAcc = matrix(nrow = iterations, ncol = numks)
 for(j in 1:iterations)
 {
-  trainIndices = sample(1:dim(beer_df_cleaned)[1],round(splitPerc * dim(beer_df_cleaned)[1]))
-  train = beer_df_cleaned[trainIndices,]
-  test = beer_df_cleaned[-trainIndices,]
+  trainIndices = sample(1:dim(beer_df_knn)[1],round(splitPerc * dim(beer_df_knn)[1]))
+  train = beer_df_knn[trainIndices,]
+  test = beer_df_knn[-trainIndices,]
   for(i in 1:numks)
   {
     classifications = knn(train[,c(7,8)],test[,c(7,8)],train$Beer_Category, prob = TRUE, k = i)
@@ -362,12 +367,15 @@ for(j in 1:iterations)
   }
   
 }
+
 MeanAcc = colMeans(masterAcc)
-MeanAcc
 mean(masterAcc)
 which.max(MeanAcc)
 max(MeanAcc)
 plot(seq(1,numks,1),MeanAcc, type = "l")
+
+plot(medv ~ lstat, data = Boston, cex = .8, col = "dodgerblue", main = "k = 1")
+lines(lstat_grid$lstat, pred_001$pred, col = "darkorange", lwd = 0.25)
 ```
 
 
@@ -422,10 +430,9 @@ us_states_data <- merge(x=us_states, y=summary_df, by.x="region", by.y="State_lw
 
 p0 <- ggplot(data = us_states_data,mapping = aes(x = long, y = lat, group = group, fill = per_capita_breweries))
 
-# p1 <- p0 + geom_polygon(color = "gray90", size = 0.1) + coord_map(projection = "albers", lat0 = 39, lat1 = 45) + labs(title = "x") + theme_map() + labs(fill = "Percent")
-# p1
+p1 <- p0 + geom_polygon(color = "gray90", size = 0.1) + coord_map(projection = "albers", lat0 = 39, lat1 = 45) + labs(title = "x") + theme_map() + labs(fill = "Percent")
 
-p2 <- p1 + scale_fill_gradient(low = "white", high = "#CB454A") + labs(title = "Per Capita Breweries per 1M Drinking Age Adults") + theme_map() + labs(fill = "Percent")
+p2 <- p1 + scale_fill_gradient(low = "white", high = "#CB454A") + labs(title = "Per Capita Breweries per 1M Drinking Age Adults") + theme_map() + labs(fill = "Percent", caption="Source: beer, brewery data")
 p2
 
 ```
