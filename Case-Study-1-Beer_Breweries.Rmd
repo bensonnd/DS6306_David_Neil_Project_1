@@ -2,7 +2,7 @@
 title: "Case Study 1 - Beer and Breweries"
 author: "By David Wei, Neil Benson"
 date: "06/15/2020"
-output: html_document
+output: html_document 
 ---
 # A review and analysis of beer and breweries by state. We will review missing data and how we filled it, number of breweries by state, summary statistics like medians and means of ABV and IBU at the beer level, and finally a review of the relationship between Ales, IPAs and other types of beer. 
 
