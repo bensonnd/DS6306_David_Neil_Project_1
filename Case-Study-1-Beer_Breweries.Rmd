@@ -321,10 +321,10 @@ cor(beer_df_cleaned$ABV.log, beer_df_cleaned$IBU)
 
 ## Analysis #8
 _After analyzing the differences between IBU and ABV factors, we then wanted to investigate how those differnces differed among different styles of beer, namely IPAs and Ale's. To do this, we utilized KNN to classify and see how well IBU and ABV would predict those beer styles. We first started by creating a higher grouping of all beer styles based on their Styles, removing all other descriptive information (ex. 'Pumpkin' Ales, 'Bitter' IPAs, etc.). Once the classification of true factors were created, we then further filtered out all non-IPA and non-Ale beer styles to exclusively see how well those variables would predict. After some tuning for 'k', we found that there was a strong relationship between IBU and ABV in respects to classifying beer styles (Accuracy ~ 0.91)._
-```{r,warning=FALSE,message=FALSE}
+```{r message=FALSE, r,warning=FALSE}
 # goal here is to use kNN to classify if a beer is Ale/IPA/Other based on it's ABV and IBU
 # creating string match pattern
-beer_df_cleaned$Beer_Category <- ifelse(grepl("Ale", beer_df_cleaned$Style), "Ale", 
+beer_df_cleaned$Beer_Category <- ifelse(grepl("Ale", beer_df_cleaned$Style), "Ale",
                                         ifelse(grepl("IPA", beer_df_cleaned$Style) | grepl("India Pale Ales", beer_df_cleaned$Style), "IPA", "Other"))
 beer_df_cleaned$Beer_Category <- as.factor(beer_df_cleaned$Beer_Category)
 
@@ -372,7 +372,7 @@ for(j in 1:iterations)
     CM = confusionMatrix(table(classifications,test$Beer_Category))
     masterAcc[j,i] = CM$overall[1]
   }
-  
+
 }
 
 MeanAcc = colMeans(masterAcc)
@@ -384,21 +384,22 @@ plot(seq(1,numks,1),MeanAcc, type = "l")
 library(plyr)
 beer_df_knn_tbl <- beer_df_knn %>% group_by(pred_beer_cat, Beer_Category) %>% tally()
 beer_df_knn_tbl$Classification <- ifelse(beer_df_knn_tbl$pred_beer_cat ==beer_df_knn_tbl$Beer_Category, "Predicted", "Not Predicted")
-beer_df_knn_graph <- beer_df_knn_tbl %>% ggplot(aes(x=Classification,y=n, fill= Classification)) + geom_bar(stat="identity")+ 
+beer_df_knn_graph <- beer_df_knn_tbl %>% ggplot(aes(x=Classification,y=n, fill= Classification)) + geom_bar(stat="identity")+
   labs(y="Count", title="Beer Style Prediction Accuracy")
 beer_df_knn_graph
-
-
 ```
 
 
 ## Analysis #9 
 _With Colorado leading the states in total number of breweries, it has 8.5 breweries per 1M adults over the age of 21. Only Vermont, Alaska, and Montana rank ahead of Colorado in breweries per capita. Note that Vermont, Alaska, and Montana are all low population states. When looking for a place to build a new brewery, we can see two advantages - moving into states with high population and high per capita breweries, or high population and low per capita breweries. For the first option, there will be stiff competition, but a beer thirsty population and often times beer destination, whereas with the second option, you could establish a market with little or no competition that could eventually become a beer attraction._
-```{r,warning=FALSE,message=FALSE}
+```{r, message=FALSE, warning=FALSE}
 
 # loading state summary data - population and elevation
-#state_data <- read.csv("C:/Users/David/Google Drive/Code & Programming/GitHub/MSDS_6306_Doing-Data-Science_Case_Study_1/DS6306_David_Neil_Project_1/Data Sources/Mean_Elevation_per_State.csv")
+
+# state_data <- read.csv("C:/Users/David/Google Drive/Code & Programming/GitHub/MSDS_6306_Doing-Data-Science_Case_Study_1/DS6306_David_Neil_Project_1/Data Sources/Mean_Elevation_per_State.csv")
+
 state_data <- read.csv("C:/Git/DS6306_David_Neil_Project_1/DS6306_David_Neil_Project_1/Data Sources/Mean_Elevation_per_State.csv")
+
 state_data <- state_data %>% plyr::rename(c("Mean.elevationList.by.state"="Mean_Elevation"))
 
 # tidying up some of the data
@@ -409,52 +410,57 @@ state_data$Population <- gsub(",", "", state_data$Population)
 state_data$Population <- as.integer(state_data$Population)
 
 
-# adding elevation and population datra to summary_df
+# adding elevation and population data to summary_df
 state_data <- state_data %>% select(State, State_Abr, Mean_Elevation, Population)
-summary_df <- merge(x=summary_df, y=state_data, by.x="State", by.y="State_Abr", all.x=TRUE)
-
+state_summary_df <- left_join(summary_df, state_data, copy = FALSE, by = c("State" = "State_Abr"))
+state_summary_df <- state_summary_df %>% plyr::rename(c("State"="State_Abr", "State.y"="State"))
 
 # counting distinct number of beers and breweries per state
 state_beer_summary <- beer_df_cleaned %>% group_by(State) %>% summarise(Beers = n_distinct(Beer_ID))
+colnames(state_beer_summary)[1] <- c("State_Abr")
+
 state_brewery_summary <- beer_df_cleaned %>% group_by(State) %>% summarise(Breweries = n_distinct(Brewery_ID))
+colnames(state_brewery_summary)[1] <- c("State_Abr")
 
+state_beer_brewery_summary <- state_beer_summary %>% left_join(state_brewery_summary, copy = FALSE, by = "State_Abr")
+state_beer_brewery_summary$State_Abr <- as.character(as.factor(state_beer_brewery_summary$State_Abr))
 
-# adding distinct number of beers and breweries to summary_df
-summary_df <- merge(x=summary_df, y=state_beer_summary, by.x="State", by.y="State", all.x=TRUE)
-summary_df <- merge(x=summary_df, y=state_brewery_summary, by.x="State", by.y="State", all.x=TRUE)
+# adding distinct number of beers and breweries to state_summary_df
+state_summary_df <- state_summary_df %>% left_join(state_beer_brewery_summary, copy = FALSE, by = "State_Abr")
 
 
 # adding beers per million and breweries per million
-summary_df <- summary_df %>% mutate(per_capita_beers = (Beers / (Population/1000000)))
-summary_df <- summary_df %>% mutate(per_capita_breweries = (Breweries / (Population/1000000)))
+state_summary_df <- state_summary_df %>% mutate(per_capita_beers = (Beers / (Population/1000000)))
+state_summary_df <- state_summary_df %>% mutate(per_capita_breweries = (Breweries / (Population/1000000)))
 
-summary_df <- summary_df %>% plyr::rename(c("State"="State_Abvr", "State.y"="State"))
+# state_summary_df <- state_summary_df %>% plyr::rename(c("State"="State_Abvr", "State.y"="State"))
 
 # reording the columns
-summary_df <- summary_df[c(12,1,2,3,4,5,6,7,8,9,10,11,13,14,15,17,16,18)]
+state_summary_df <- state_summary_df[c(12,1,2,3,4,5,6,7,8,9,10,11,13,14,15,17,16,18)]
 
 library(maps)
-us_states <- map_data("state") 
+us_states <- map_data("state")
 
-summary_df$State_lwrcase <- tolower(summary_df$State)
+state_summary_df$State_lwrcase <- tolower(state_summary_df$State)
 
-us_states_data <- merge(x=us_states, y=summary_df, by.x="region", by.y="State_lwrcase")
+# us_states_data <- merge(x=us_states, y=state_summary_df, by.x="region", by.y="State_lwrcase")
+us_states_data <- left_join(us_states, state_summary_df, copy = FALSE, by = c("region" = "State_lwrcase"))
 
 p0 <- ggplot(data = us_states_data,mapping = aes(x = long, y = lat, group = group, fill = per_capita_breweries))
 
 p1 <- p0 + geom_polygon(color = "gray90", size = 0.1) + coord_map(projection = "albers", lat0 = 39, lat1 = 45) + labs(title = "x") + theme_map() + labs(fill = "Percent")
 
-p2 <- p1 + scale_fill_gradient(low = "white", high = "#CB454A") + labs(title = "Per Capita Breweries per 1M Drinking Age Adults") + theme_map() + labs(fill = "Percent", caption="Source: beer, brewery data")
+p2 <- p1 + scale_fill_gradient(low = "white", high = "midnightblue") + labs(title = "Per Capita Breweries per 1M Drinking Age Adults") + theme_map() + labs(fill = "Percent", caption="Source: beer, brewery data")
 p2
 
 # number of breweries, beers per capita, and breweries per capita in CO and TX
-summary_df_co_TX <- summary_df %>% filter(State_Abvr == 'CO' | State_Abvr == 'TX') %>% select(State, Population, Breweries, per_capita_breweries, Beers, per_capita_beers, Median_ABV, Max_ABV, Median_IBU, Max_IBU)
+summary_df_co_TX <- state_summary_df %>% filter(State_Abr == 'CO' | State_Abr == 'TX') %>% select(State, Population, Breweries, per_capita_breweries, Beers, per_capita_beers, Median_ABV, Max_ABV, Median_IBU, Max_IBU)
 
 # least and most popular beers in CO and TX
 beer_df_cleaned_co <- beer_df_cleaned %>%
   filter(State == 'CO' & Style != '') %>%
   group_by(State, Style) %>%
-  summarise(Beers = n_distinct(Beer_ID)) 
+  summarise(Beers = n_distinct(Beer_ID))
 
 
 beer_df_cleaned_co_top5 <- head(beer_df_cleaned_co[order(-beer_df_cleaned_co$Beers),],5)
@@ -465,7 +471,7 @@ beer_df_cleaned_co_bot5 <- tail(beer_df_cleaned_co[order(-beer_df_cleaned_co$Bee
 beer_df_cleaned_tx <- beer_df_cleaned %>%
   filter(State == 'TX' & Style != '') %>%
   group_by(State, Style) %>%
-  summarise(Beers = n_distinct(Beer_ID)) 
+  summarise(Beers = n_distinct(Beer_ID))
 
 beer_df_cleaned_tx_top5 <- head(beer_df_cleaned_tx[order(-beer_df_cleaned_tx$Beers),],5)
 beer_df_cleaned_tx_bot5 <- tail(beer_df_cleaned_tx[order(-beer_df_cleaned_tx$Beers),],5)
