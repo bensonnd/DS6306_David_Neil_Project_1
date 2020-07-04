@@ -4,6 +4,8 @@ author: "By David Wei, Neil Benson"
 date: "06/15/2020"
 output: html_document
 ---
+# A review and analysis of beer and breweries by state. We will review missing data and how we filled it, number of breweries by state, summary statistics like medians and means of ABV and IBU at the beer level, and finally a review of the relationship between Ales, IPAs and other types of beer. 
+
 
 ## Import File & General Libraries
 _We first start with importing the main libraries and then reading in files and showing first 5 lines of both beer and brewery datasets._
@@ -21,7 +23,7 @@ beer <- read.csv("C:/Git/MSDS_6306_Doing-Data-Science/Unit 8 and 9 Case Study 1/
 brew <- read.csv("C:/Git/MSDS_6306_Doing-Data-Science/Unit 8 and 9 Case Study 1/Breweries.csv")
 
 ```
-#### Reviewing the first 6 records of beer
+#### Reviewing the first 5 records of beer
 |Name 				          |Beer_ID   		  |ABV 		    |IBU 	  |Brewery_id 	  |Style 							            |Ounces	|
 |-----------------------|---------------|-----------|-------|---------------|-------------------------------|-------|
 |Pub Beer    			      |1436 			    |0.050  	  |NA     |409			      |American Pale Lager     		    |12		  |
@@ -29,9 +31,9 @@ brew <- read.csv("C:/Git/MSDS_6306_Doing-Data-Science/Unit 8 and 9 Case Study 1/
 |Rise of the Phoenix    |2264 			    |0.071  	  |NA     |178			      |American IPA     				      |12		  |
 |Sinister    			      |2263 			    |0.090  	  |NA     |178			      |American Double / Imperial IPA |12		  |
 |Sex and Candy    		  |2262 			    |0.075  	  |NA     |178			      |American IPA     				      |12		  |
-|Black Exodus    		    |2261 			    |0.077  	  |NA     |178			      |Oatmeal Stout     				      |12    	|  
 
-#### Reviewing the first 6 records of brewery
+
+#### Reviewing the first 5 records of brewery
 |Brew_ID|Name					             |City          |State |
 |-------|--------------------------|--------------|------|
 |1		  |NorthGate Brewing 		     |Minneapolis   |MN    |
@@ -39,12 +41,11 @@ brew <- read.csv("C:/Git/MSDS_6306_Doing-Data-Science/Unit 8 and 9 Case Study 1/
 |3		  |Jack's Abby Craft Lagers  |Framingham    |MA    |
 |4		  |Mike Hess Brewing Company |San Diego     |CA    |
 |5		  |Fort Point Beer Company   |San Francisco |CA    |
-|6		  |COAST Brewing Company	   |Charleston    |SC    |     
 
 
 ## Analysis #1
 _Once our data has been imported we can now begin our analysis starting with our first question of determing how many breweries are 
-present in each state. After counting the number of unique breweries per state, we found that Colorado leads in having 47 breweries._
+present in each state. After counting the number of unique breweries per state, we found that Colorado leads in having 47 breweries with three states ND, SD, WV and DC having only 1 each._
 ```{r,warning=FALSE,message=FALSE}
 brew %>%
   group_by(State) %>%
@@ -53,8 +54,24 @@ brew %>%
   ggplot(aes(x = State, y = Breweries, fill=State)) + 
   geom_bar(stat="identity") + 
   theme(legend.position = "none", axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size = 8)) + 
-  ggtitle("# of Breweries per State")
+  ggtitle("Descending # of Breweries per State")
 ```
+
+#### Number of breweries per state
+|State	|Breweries	|State	|Breweries	|State	|Breweries	|State	|Breweries	|State	|Breweries	|
+|-------|-----------|-------|-----------|-------|-----------|-------|-----------|-------|-----------|
+|AK   	| 7         |HI 	  | 4         |ME 	  | 9         |NJ 	  | 3         |SD 	  | 1         |
+|AK   	| 7         |HI 	  | 4         |ME 	  | 9         |NJ 	  | 3         |SD 	  | 1         |
+|AL   	| 3         |IA 	  | 5         |MI 	  |32         |NM 	  | 4         |TN 	  | 3         |
+|AR   	| 2         |ID   	| 5         |MN 	  |12         |NV   	| 2         |TX   	|28        x |
+|AZ   	|11         |IL   	|18         |MO 	  | 9         |NY   	|16         |UT   	| 4         |
+|CA     |39         |IN   	|22         |MS 	  | 2         |OH   	|15         |VA   	|16         |
+|CO   	|47         |KS   	| 3         |MT 	  | 9         |OK   	| 6         |VT   	|10         |
+|CT   	| 8         |KY 	  | 4         |NC 	  |19         |OR 	  |29         |WA   	|23         |
+|DC   	| 1         |LA   	| 5         |ND 	  | 1         |PA   	|25         |WI   	|20         |
+|DE   	| 2         |MA    	|23         |NE     | 5         |RI    	| 5         |WV   	| 1         |
+|FL   	|15         |MD   	| 7         |NH 	  | 3         |SC   	| 4         |WY   	| 4         |
+|GA   	| 7         |	     	|			      |		    |			      |		    |			      |		    |		      	|
 
 
 ## Analysis #2
@@ -80,7 +97,7 @@ beer_df$State <- str_trim(beer_df$State,side="both")
 
 ```
 
-#### Reviewing the first 6 records after join
+#### Reviewing the first 5 records after join
 |Brewery_ID |Brewery_Name 					         |Beer_ID|Beer_Name    				       |City		 	     |State	 |ABV 	 |IBU	   |Style 									             |Oz|
 |-----------|--------------------------------|-------|---------------------------|---------------|-------|-------|-------|-------------------------------------|--|
 |1 			    |NorthGate Brewing  			       |2692   |Get Together 				       |Minneapolis	   |MN 	   |0.045  |50		 |American IPA 							           |16|
@@ -88,12 +105,10 @@ beer_df$State <- str_trim(beer_df$State,side="both")
 |1 			    |NorthGate Brewing  			       |2690   |Wall's End 				         |Minneapolis    |MN 	   |0.048  |19     |English Brown Ale 						       |16|
 |1 			    |NorthGate Brewing  			       |2689   |Pumpion 					         |Minneapolis    |MN 	   |0.060  |38     |Pumpkin Ale 							           |16|
 |1 			    |NorthGate Brewing  			       |2688   |Stronghold 				         |Minneapolis    |MN 	   |0.060  |25     |American Porter 						         |16|
-|1 			    |NorthGate Brewing  			       |2687   |Parapet ESB 				       |Minneapolis    |MN 	   |0.056  |47 	   |Extra Special / Strong Bitter (ESB)  |16|
 
-#### Reviewing the last 6 records after join
+#### Reviewing the last 5 records after join
 |Brewery_ID |Brewery_Name 					         |Beer_ID|Beer_Name          		     |City 			     |State  |ABV 	 |IBU    |Style 									             |Oz|
 |-----------|--------------------------------|-------|---------------------------|---------------|-------|-------|-------|-------------------------------------|--|
-|556        |Ukiah Brewing Company      	   |98     |Pilsner Ukiah         		 |Ukiah    		   |CA 	   |0.055  |NA     |German Pilsener 						         |12|
 |557        |Butternuts Beer and Ale      	 |52  	 |Heinnieweisse Weissebier 	 |Garrattsville  |NY 	   |0.049  |NA     |Hefeweizen 							             |12|
 |557        |Butternuts Beer and Ale      	 |51     |Snapperhead IPA 			     |Garrattsville  |NY 	   |0.068  |NA     |American IPA 							           |12|
 |557        |Butternuts Beer and Ale      	 |50     |Moo Thunder Stout 			   |Garrattsville  |NY 	   |0.049  |NA     |Milk / Sweet Stout 					         |12|
@@ -172,10 +187,10 @@ vis_miss(beer_df_cleaned) + xlab("Data Columns")
 ```
 
 #### Address the missing values in each column
-IBU missing 41.7% of data
-ABV missing 2.57% of data
-All other data noted as complete
-Missing data was filled in using the average ABV and average IBU by beer style
+IBU missing 41.7% of data  
+ABV missing 2.57% of data  
+All other data noted as complete  
+Missing data was filled in using the average ABV and average IBU by beer style  
 
 
 ## Analysis #4
@@ -199,7 +214,7 @@ summary_df$max_ABV.scaled= scale(summary_df$Max_ABV)
 summary_df$max_IBU.scaled = scale(summary_df$Max_IBU)
 ```
 
-#### Reviewing summary_df
+#### Reviewing the first 5 records of summary_df
 |State|Median_ABV|Max_ABV|Median_IBU|Max_IBU| median_ABV.scaled|median_IBU.scaled| max_ABV.scaled| max_IBU.scaled|
 |-----|----------|-------|----------|-------|------------------|-----------------|---------------|---------------|
 |AK   |0.056     |0.068  |34.0      |71     |0.006867089       |0.02227067       |-1.4023857     |-1.1581394     |
@@ -244,7 +259,7 @@ summary_df %>% arrange(desc(Median_IBU)) %>%
 
 ## Analysis #5
 _We next examined which state has the most alcoholic (ABV) most bitter (IBU) beer. 
-We found that Colorado has the most alcoholic beers while Oregon had the most bitter. _
+We found that Colorado has the most alcoholic beers while Oregon had the most bitter. Both of which are in the top 5 for number of breweries and top 6 for breweries per capita._
 ```{r}
 ## comparing ABV vs IBU max
 
@@ -272,7 +287,7 @@ summary_df %>% arrange(desc(Max_IBU)) %>% mutate(State=fct_reorder(State, Max_IB
 ## Analysis #6
 _Another aspect of the beer's ABV we looked into was the distribution and general statistics of ABV across all beers. 
 Here we found that most of the beers fell within a normal distribution with most beers generally being somewhat equal in its 
-alcoholic content. One thing to note in particular was how  _
+alcoholic content. One thing to note in particular was how many beers hover around the .05 ABV. This could be due to state laws or consumers' taste for moderate alcohol content in their beer._
 ```{r,warning=FALSE,message=FALSE}
 
 summary(beer_df_cleaned$ABV)
@@ -288,7 +303,7 @@ describe(beer_df_cleaned$ABV)
 
 
 ## Analysis #7 
-_Relationship between IBU and ABV?_
+_Relationship between IBU and ABV? We do see a positive,moderate correlation between ABV and IBU with r value of .57; the projeced IBU increases as ABV increases to some degree. It's estimated that about 32.55% of the variation of a beer's bitterness can be attributed to how much alcohol the beer has._
 ```{r,warning=FALSE,message=FALSE}
 
 # logging variables to see if it helps improve correlation
@@ -313,34 +328,23 @@ cor(beer_df_cleaned$ABV.log, beer_df_cleaned$IBU)
 
 
 ## Analysis #8
-_Difference of IBU and ABV between IPAs and other Ales?_
+_Difference of IBU and ABV between IPAs, Ales, and other? When using a KNN model, we can project a beer's predicted style just by reviewing its IBU with approximately 71.91% accuracy. With regards to IBU alone, identifying the beer's style as IPA is much easier than Ales or Other._
 ```{r,warning=FALSE,message=FALSE}
 # goal here is to use kNN to classify if a beer is Ale/IPA/Other based on it's ABV and IBU
 # viewing all types of beer styles
 beer_df_cleaned %>% group_by(Style) %>% select(Style)
 
-# # converting existing beers into type categories
-# beer_df_cleaned$Style[grep("Ale", beer_df_cleaned$Style)]
-# beer_df_cleaned$Style[grep("IPA", beer_df_cleaned$Style)]
-# beer_df_cleaned$Style[grep("Lager", beer_df_cleaned$Style)]
 
 # creating string match pattern
 beer_df_cleaned$Beer_Category <- ifelse(grepl("Ale", beer_df_cleaned$Style), "Ale", 
                                         ifelse(grepl("IPA", beer_df_cleaned$Style) | grepl("India Pale Ales", beer_df_cleaned$Style), "IPA", "Other"))
-head(beer_df_cleaned, 5)
 
-beer_df_cleaned %>% group_by(Style) %>% select(IBU, Style) %>% summarise(Mean_IBU=mean(IBU)) %>% ggplot(aes(x=Style, y=Mean_IBU))+geom_point() + geom_smooth(method='lm')
-head(beer_df_cleaned, 5)
 
 # kNN
 library(class) # for knn
 library(caret) # for confusionMatrix
-# match("ABV", names(beer_df_cleaned)) # column 7
-# match("IBU", names(beer_df_cleaned)) # column 8
-# running kNN k=5
 
 
-# knn.cv(beer_df_cleaned[,c(7,8)],beer_df_cleaned$Beer_Category,prob = TRUE, k = 5)
 beer_df_cleaned$pred_beer_cat <- knn.cv(beer_df_cleaned[,c(7,8)],beer_df_cleaned$Beer_Category,prob = TRUE, k = 5)
 
 confusionMatrix(table(beer_df_cleaned$pred_beer_cat,beer_df_cleaned$Beer_Category))
@@ -348,7 +352,7 @@ confusionMatrix(table(beer_df_cleaned$pred_beer_cat,beer_df_cleaned$Beer_Categor
 
 
 ## Analysis #9 
-_EDA inference_
+_With Colorado leading the states in total number of breweries, it has 8.5 breweries per 1M adults over the age of 21. Only Vermont, Alaska, and Montana rank ahead of Colorado in breweries per capita. Note that Vermont, Alaska, and Montana are all low population states. When looking for a place to build a new brewery, we can see two advantages - moving into states with high population and high per capita breweries, or high population and low per capita breweries. For the first option, there will be stiff competition, but a beer thirsty population and often times beer destination, whereas with the second option, you could establish a market with little or no competition that could eventually become a beer attraction._
 ```{r}
 # loading state summary data - population and elevation
 state_data <- read.csv("C:/Git/DS6306_David_Neil_Project_1/DS6306_David_Neil_Project_1/Data Sources/Mean_Elevation_per_State.csv")
@@ -390,17 +394,68 @@ library(maps)
 us_states <- map_data("state")
 
 summary_df$State_lwrcase <- tolower(summary_df$State)
-head(state_data, 5)
 
 us_states_data <- merge(x=us_states, y=summary_df, by.x="region", by.y="State_lwrcase")
-
 
 p0 <- ggplot(data = us_states_data,mapping = aes(x = long, y = lat, group = group, fill = per_capita_breweries))
 
 p1 <- p0 + geom_polygon(color = "gray90", size = 0.1) + coord_map(projection = "albers", lat0 = 39, lat1 = 45) + labs(title = "x") + theme_map() + labs(fill = "Percent")
-p1
+
 
 p2 <- p1 + scale_fill_gradient(low = "white", high = "#CB454A") + labs(title = "Per Capita Breweries per 1M Drinking Age Adults") + theme_map() + labs(fill = "Percent")
 p2
 
+# number of breweries, beers per capita, and breweries per capita in CO and TX
+summary_df_co_TX <- summary_df %>% filter(State_Abvr == 'CO' | State_Abvr == 'TX') %>% select(State, Population, Breweries, per_capita_breweries, Beers, per_capita_beers, Median_ABV, Max_ABV, Median_IBU, Max_IBU)
+
+# least and most popular beers in CO and TX
+beer_df_cleaned_co <- beer_df_cleaned %>%
+  filter(State == 'CO' & Style != '') %>%
+  group_by(State, Style) %>%
+  summarise(Beers = n_distinct(Beer_ID)) 
+
+
+beer_df_cleaned_co_top5 <- head(beer_df_cleaned_co[order(-beer_df_cleaned_co$Beers),],5)
+beer_df_cleaned_co_bot5 <- tail(beer_df_cleaned_co[order(-beer_df_cleaned_co$Beers),],5)
+
+
+# least and most popular beers in CO and TX
+beer_df_cleaned_tx <- beer_df_cleaned %>%
+  filter(State == 'TX' & Style != '') %>%
+  group_by(State, Style) %>%
+  summarise(Beers = n_distinct(Beer_ID)) 
+
+beer_df_cleaned_tx_top5 <- head(beer_df_cleaned_tx[order(-beer_df_cleaned_tx$Beers),],5)
+beer_df_cleaned_tx_bot5 <- tail(beer_df_cleaned_tx[order(-beer_df_cleaned_tx$Beers),],5)
+
+co_tx_top5 <- rbind(beer_df_cleaned_co_top5,beer_df_cleaned_tx_top5)
+co_tx_bot5 <- rbind(beer_df_cleaned_co_bot5,beer_df_cleaned_tx_bot5)
 ```
+
+#### Most popular beer types in CO and TX
+|State	|Most Popular Beers				      |Count	|
+|-------|-------------------------------|-------| 
+|CO		  |American IPA					          |40		  |
+|CO	  	|American Pale Ale (APA)		    |40     |
+|CO	  	|American Amber / Red Ale		    |19     |
+|CO	  	|American Double / Imperial IPA	|14     |
+|CO	  	|American Blonde Ale			      |11     |
+|TX	  	|American Pale Ale (APA)		    |13     |
+|TX	  	|American IPA					          |12     |
+|TX	  	|American Blonde Ale			      |10     |
+|TX	  	|American Double / Imperial IPA	|10     |
+|TX	  	|Saison / Farmhouse Ale			    |9      |
+  
+#### Least popular beer types in CO and TX
+|State	|Least Popular Beers			      |Count	|
+|-------|-------------------------------|-------|
+|CO	  	|Quadrupel (Quad)				        |1		  |
+|CO	  	|Roggenbier						          |1		  |
+|CO	  	|Rye Beer						            |1		  |
+|CO	  	|Schwarzbier					          |1	  	|
+|CO	  	|Tripel							            |1	  	|
+|TX	  	|Munich Dunkel Lager			      |1	   	|
+|TX	  	|Old Ale						            |1	  	|
+|TX	  	|Rye Beer						            |1   		|
+|TX	  	|Schwarzbier					          |1	  	|
+|TX	  	|Smoked Beer					          |1	  	|
