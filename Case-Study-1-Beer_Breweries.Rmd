@@ -17,10 +17,10 @@ library(tidyverse)
 library(forcats)
 
 
-beer <- read.csv("C:/Users/David/Google Drive/Masters/Data Files/Beers.csv")
-brew <- read.csv("C:/Users/David/Google Drive/Masters/Data Files/Breweries.csv")
-# beer <- read.csv("C:/Git/MSDS_6306_Doing-Data-Science/Unit 8 and 9 Case Study 1/Beers.csv")
-# brew <- read.csv("C:/Git/MSDS_6306_Doing-Data-Science/Unit 8 and 9 Case Study 1/Breweries.csv")
+# beer <- read.csv("C:/Users/David/Google Drive/Masters/Data Files/Beers.csv")
+# brew <- read.csv("C:/Users/David/Google Drive/Masters/Data Files/Breweries.csv")
+beer <- read.csv("C:/Git/MSDS_6306_Doing-Data-Science/Unit 8 and 9 Case Study 1/Beers.csv")
+brew <- read.csv("C:/Git/MSDS_6306_Doing-Data-Science/Unit 8 and 9 Case Study 1/Breweries.csv")
 
 ```
 #### Reviewing the first 5 records of beer
@@ -44,8 +44,7 @@ brew <- read.csv("C:/Users/David/Google Drive/Masters/Data Files/Breweries.csv")
 
 
 ## Analysis #1
-_Once our data has been imported we can now begin our analysis starting with our first question of determing how many breweries are 
-present in each state. After counting the number of unique breweries per state, we found that Colorado leads in having 47 breweries with three states ND, SD, WV and DC having only 1 each._
+_Once our data has been imported we can now begin our analysis starting with our first question of determing how many breweries are present in each state. After counting the number of unique breweries per state, we found that Colorado leads in having 47 breweries with three states ND, SD, WV and DC having only 1 each._
 ```{r,warning=FALSE,message=FALSE}
 brew %>%
   group_by(State) %>%
@@ -63,7 +62,7 @@ brew %>%
 |AK   	| 7         |HI 	  | 4         |ME 	  | 9         |NJ 	  | 3         |SD 	  | 1         |
 |AK   	| 7         |HI 	  | 4         |ME 	  | 9         |NJ 	  | 3         |SD 	  | 1         |
 |AL   	| 3         |IA 	  | 5         |MI 	  |32         |NM 	  | 4         |TN 	  | 3         |
-|AR   	| 2         |ID   	| 5         |MN 	  |12         |NV   	| 2         |TX   	|28        x |
+|AR   	| 2         |ID   	| 5         |MN 	  |12         |NV   	| 2         |TX   	|28         |
 |AZ   	|11         |IL   	|18         |MO 	  | 9         |NY   	|16         |UT   	| 4         |
 |CA     |39         |IN   	|22         |MS 	  | 2         |OH   	|15         |VA   	|16         |
 |CO   	|47         |KS   	| 3         |MT 	  | 9         |OK   	| 6         |VT   	|10         |
@@ -116,9 +115,7 @@ beer_df$State <- str_trim(beer_df$State,side="both")
 
 
 ## Analysis #3
-_Addressing missing values in each column, we found that almost half (~42%) of IBU data was missing, and a little over 2.5% of AV data was missing. 
-Imputation was applied to correct the missing data, however, we found that impuation actually underfitted the data values for IBU and ABV
-and so we added an additional layer of logic to the imputation by applying means of IBU and ABV per style of beer to provide higher accuracy._
+_Addressing missing values in each column, we found that almost half (~42%) of IBU data was missing, and a little over 2.5% of AV data was missing. Imputation was applied to correct the missing data, however, we found that impuation actually underfitted the data values for IBU and ABV and so we added an additional layer of logic to the imputation by applying means of IBU and ABV per style of beer to provide higher accuracy._
 ```{r,warning=FALSE,message=FALSE}
 library(naniar)
 library(corrplot)
@@ -193,9 +190,7 @@ Missing data was filled in using the average ABV and average IBU by beer style
 
 
 ## Analysis #4
-_The Median alcohol content (ABV) and international bitterness unit (IBU) for each state was looked into by scaling the ABU and IBU coefficients 
-at a comparitive level due to how different each unit of measurement is. Additionally, we individually plotted the mean measurements per state and 
-found that most beers fell within relative range of each other with only a handful of states significantly differing from the rest._
+_The Median alcohol content (ABV) and international bitterness unit (IBU) for each state was looked into by scaling the ABU and IBU coefficients at a comparitive level due to how different each unit of measurement is. Additionally, we individually plotted the mean measurements per state and found that most beers fell within relative range of each other with only a handful of states significantly differing from the rest._
 ```{r,warning=FALSE,message=FALSE}
 
 # creating logic column as calculation of medians and storing each as seperate dfs
@@ -257,8 +252,7 @@ summary_df %>% arrange(desc(Median_IBU)) %>%
 
 
 ## Analysis #5
-_We next examined which state has the most alcoholic (ABV) most bitter (IBU) beer. 
-We found that Colorado has the most alcoholic beers while Oregon had the most bitter. Both of which are in the top 5 for number of breweries and top 6 for breweries per capita._
+_We next examined which state has the most alcoholic (ABV) most bitter (IBU) beer. We found that Colorado has the most alcoholic beers while Oregon had the most bitter. Both of which are in the top 5 for number of breweries and top 6 for breweries per capita._
 ```{r}
 ## comparing ABV vs IBU max
 
@@ -284,17 +278,17 @@ summary_df %>% arrange(desc(Max_IBU)) %>% mutate(State=fct_reorder(State, Max_IB
 
 
 ## Analysis #6
-_Another aspect of the beer's ABV we looked into was the distribution and general statistics of ABV across all beers. 
-Here we found that most of the beers fell within a normal distribution with most beers generally being somewhat equal in its alcoholic content. One thing to note in particular was the right skew in the distribution since the default deifition of "Beer" under federal law is 
-anything greater than 0.5% alcohol thus explaning the skewness._
-
+_Another aspect of the beer's ABV we looked-into was the distribution and general statistics of ABV across all beers. Here we found that most of the beers fell within a normal distribution with most beers generally being somewhat equal in their alcoholic content. One thing to note in particular was the right skew in the distribution since the default definition of "Beer" under federal law is anything greater than 0.5% alcohol thus explaining the skewness._
 ```{r,warning=FALSE,message=FALSE}
 
 summary(beer_df_cleaned$ABV)
 
-summary_ABV <- beer_df_cleaned %>% ggplot(aes(beer_df_cleaned$ABV)) +  geom_histogram(aes(y=..density..), bindwidth=50)+
- geom_density()
+summary_ABV <- beer_df_cleaned %>% ggplot(aes(ABV)) +  
+  geom_histogram(aes(y=..density..), color = "gray45",fill = "darkturquoise", binwidth = .01, bins = 50) +
+  geom_density() +
+  labs(x="ABV%", y="Density", title="Beer AVB test Distribution")
 summary_ABV
+
 
 library(psych)
 describe(beer_df_cleaned$ABV)
@@ -302,9 +296,7 @@ describe(beer_df_cleaned$ABV)
 
 
 ## Analysis #7 
-_After examining how IBU differs from ABV from varying perspectives, we wanted to examine more closely the relationship between IBU and ABV. 
-This was done simply by plotting each variable without any transformations applied as interpretation was important. We found that after even after imputing IBU values
-with the mean per beer style, there is still mild evidence supporting a linear relationship between the two (corr=0.539)._
+_After examining how IBU differs from ABV from varying perspectives, we wanted to examine more closely the relationship between IBU and ABV. This was done simply by plotting each variable without any transformations applied as interpretation was important. We found that after even after imputing IBU values with the mean per beer style, there is still mild evidence supporting a linear relationship between the two (corr=0.539)._
 ```{r,warning=FALSE,message=FALSE}
 # logging variables to see if it helps improve correlation
 beer_df_cleaned$ABV.log <- log(beer_df_cleaned$ABV)
@@ -328,8 +320,7 @@ cor(beer_df_cleaned$ABV.log, beer_df_cleaned$IBU)
 
 
 ## Analysis #8
-_After analyzing the differences between IBU and ABV factors, we then wanted to investigate how those differnces differed among
-different styles of beer, namely IPAs and Ale's. To do this, we utilized KNN to classify and see how well IBU and ABV would predict those beer styles. We first started by creating a higher grouping of all beer styles based on their Styles, removing all other descriptive information (ex. 'Pumpkin' Ales, 'Bitter' IPAs, etc.). Once the classification of true factors were created, we then further filtered out all non-IPA and non-Ale beer styles to exclusively see how well those variables would predict. After some tuning for 'k', we found that there was a strong relationship between IBU and ABV in respects to classifying beer styles (Accuracy ~ 0.91)._
+_After analyzing the differences between IBU and ABV factors, we then wanted to investigate how those differnces differed among different styles of beer, namely IPAs and Ale's. To do this, we utilized KNN to classify and see how well IBU and ABV would predict those beer styles. We first started by creating a higher grouping of all beer styles based on their Styles, removing all other descriptive information (ex. 'Pumpkin' Ales, 'Bitter' IPAs, etc.). Once the classification of true factors were created, we then further filtered out all non-IPA and non-Ale beer styles to exclusively see how well those variables would predict. After some tuning for 'k', we found that there was a strong relationship between IBU and ABV in respects to classifying beer styles (Accuracy ~ 0.91)._
 ```{r,warning=FALSE,message=FALSE}
 # goal here is to use kNN to classify if a beer is Ale/IPA/Other based on it's ABV and IBU
 # creating string match pattern
@@ -390,8 +381,14 @@ which.max(MeanAcc)
 max(MeanAcc)
 plot(seq(1,numks,1),MeanAcc, type = "l")
 
-plot(medv ~ lstat, data = Boston, cex = .8, col = "dodgerblue", main = "k = 1")
-lines(lstat_grid$lstat, pred_001$pred, col = "darkorange", lwd = 0.25)
+library(plyr)
+beer_df_knn_tbl <- beer_df_knn %>% group_by(pred_beer_cat, Beer_Category) %>% tally()
+beer_df_knn_tbl$Classification <- ifelse(beer_df_knn_tbl$pred_beer_cat ==beer_df_knn_tbl$Beer_Category, "Predicted", "Not Predicted")
+beer_df_knn_graph <- beer_df_knn_tbl %>% ggplot(aes(x=Classification,y=n, fill= Classification)) + geom_bar(stat="identity")+ 
+  labs(y="Count", title="Beer Style Prediction Accuracy")
+beer_df_knn_graph
+
+
 ```
 
 
@@ -400,8 +397,8 @@ _With Colorado leading the states in total number of breweries, it has 8.5 brewe
 ```{r,warning=FALSE,message=FALSE}
 
 # loading state summary data - population and elevation
-state_data <- read.csv("C:/Users/David/Google Drive/Code & Programming/GitHub/MSDS_6306_Doing-Data-Science_Case_Study_1/DS6306_David_Neil_Project_1/Data Sources/Mean_Elevation_per_State.csv")
-# state_data <- read.csv("C:/Git/DS6306_David_Neil_Project_1/DS6306_David_Neil_Project_1/Data Sources/Mean_Elevation_per_State.csv")
+#state_data <- read.csv("C:/Users/David/Google Drive/Code & Programming/GitHub/MSDS_6306_Doing-Data-Science_Case_Study_1/DS6306_David_Neil_Project_1/Data Sources/Mean_Elevation_per_State.csv")
+state_data <- read.csv("C:/Git/DS6306_David_Neil_Project_1/DS6306_David_Neil_Project_1/Data Sources/Mean_Elevation_per_State.csv")
 state_data <- state_data %>% plyr::rename(c("Mean.elevationList.by.state"="Mean_Elevation"))
 
 # tidying up some of the data
